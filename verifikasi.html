@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIKS-NG | Verifikasi Akun</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="layout">
+
+  <div class="panel">
+    <div class="brand">
+      <div class="brand-mark">NG</div>
+      <div class="brand-name">SIKS<span>-NG</span></div>
+    </div>
+
+    <div class="panel-copy">
+      <div class="eyebrow">Verifikasi Operator</div>
+      <h1>Satu langkah lagi untuk mengamankan akun Anda.</h1>
+      <p>Kode verifikasi memastikan hanya operator terdaftar yang dapat mengubah data kesejahteraan sosial di wilayah Anda.</p>
+
+      <div class="network">
+        <svg viewBox="0 0 440 240" xmlns="http://www.w3.org/2000/svg">
+          <line class="link" x1="60" y1="190" x2="150" y2="120"/>
+          <line class="link" x1="150" y1="120" x2="230" y2="70"/>
+          <line class="link" x1="230" y1="70" x2="330" y2="110"/>
+          <line class="link" x1="230" y1="70" x2="310" y2="30"/>
+          <line class="link" x1="150" y1="120" x2="90" y2="60"/>
+          <line class="link" x1="330" y1="110" x2="390" y2="170"/>
+          <line class="link" x1="230" y1="70" x2="140" y2="30"/>
+          <circle class="node-dim" cx="60" cy="190" r="6"/>
+          <circle class="node-dim" cx="90" cy="60" r="5"/>
+          <circle class="node-dim" cx="140" cy="30" r="5"/>
+          <circle class="node-dim" cx="310" cy="30" r="5"/>
+          <circle class="node-dim" cx="390" cy="170" r="6"/>
+          <circle class="node" cx="150" cy="120" r="7"/>
+          <circle class="node" cx="230" cy="70" r="8"/>
+          <circle class="node" cx="330" cy="110" r="7"/>
+          <circle class="pulse" cx="230" cy="70" r="4"/>
+          <circle class="pulse d2" cx="150" cy="120" r="4"/>
+          <circle class="pulse d3" cx="330" cy="110" r="4"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="foot-note">
+      <span>Kementerian Sosial RI</span>
+      <span>&middot;</span>
+      <span>DTKS &amp; DTSEN</span>
+    </div>
+  </div>
+
+  <div class="form-side">
+    <div class="card">
+      <a href="index.html" class="back-link">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+        Kembali ke halaman masuk
+      </a>
+
+      <div class="card-head">
+        <h2>Verifikasi akun Anda</h2>
+        <p>Kami telah mengirim kode 6 digit ke <strong>0812-xxxx-1290</strong>. Masukkan kode tersebut untuk melanjutkan.</p>
+      </div>
+
+      <div class="success-msg" id="successMsg">
+        <span>Verifikasi berhasil. Mengalihkan ke dasbor...</span>
+      </div>
+      <div class="error-msg" id="errorMsg">
+        <span>Kode yang Anda masukkan tidak valid. Silakan coba lagi.</span>
+      </div>
+
+      <form id="otpForm">
+        <div class="otp-row">
+          <input type="text" maxlength="1" inputmode="numeric" class="otp-digit" required>
+          <input type="text" maxlength="1" inputmode="numeric" class="otp-digit" required>
+          <input type="text" maxlength="1" inputmode="numeric" class="otp-digit" required>
+          <input type="text" maxlength="1" inputmode="numeric" class="otp-digit" required>
+          <input type="text" maxlength="1" inputmode="numeric" class="otp-digit" required>
+          <input type="text" maxlength="1" inputmode="numeric" class="otp-digit" required>
+        </div>
+
+        <button type="submit" class="btn-primary">Verifikasi Kode</button>
+      </form>
+
+      <div class="divider">butuh bantuan</div>
+      <p class="helper-text">Tidak menerima kode? <a class="link-teal" href="#" id="resendLink">Kirim ulang</a></p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // Auto-advance between OTP boxes
+  var digits = document.querySelectorAll('.otp-digit');
+  digits.forEach(function(input, idx){
+    input.addEventListener('input', function(){
+      this.value = this.value.replace(/[^0-9]/g, '');
+      if(this.value && idx < digits.length - 1){
+        digits[idx + 1].focus();
+      }
+    });
+    input.addEventListener('keydown', function(e){
+      if(e.key === 'Backspace' && !this.value && idx > 0){
+        digits[idx - 1].focus();
+      }
+    });
+  });
+
+  document.getElementById('otpForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    var code = Array.from(digits).map(function(d){ return d.value; }).join('');
+    var errorBox = document.getElementById('errorMsg');
+    var successBox = document.getElementById('successMsg');
+
+    if(code.length < 6){
+      errorBox.classList.add('show');
+      successBox.classList.remove('show');
+      return;
+    }
+    // placeholder success path — replace with real OTP check
+    errorBox.classList.remove('show');
+    successBox.classList.add('show');
+    setTimeout(function(){ window.location.href = 'dashboard.html'; }, 1200);
+  });
+
+  document.getElementById('resendLink').addEventListener('click', function(e){
+    e.preventDefault();
+    alert('Kode verifikasi baru telah dikirim.');
+  });
+</script>
+</body>
+</html>
