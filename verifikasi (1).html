@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIKS-NG | Verifikasi Keamanan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#122A4D; --navy-deep:#0B1D38; --blue:#1B4FD8;
+    --bg-lav:#E9EEFC; --bg-blue:#DCE7FA;
+    --ink:#1E293B; --ink-soft:#64748B; --line:#E2E8F0; --white:#FFFFFF;
+    --teal:#12897E; --teal-deep:#0E6F66; --red:#DC2626;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Inter',sans-serif;min-height:100vh;
+    background:linear-gradient(160deg, var(--bg-lav) 0%, #EEF1FB 45%, var(--bg-blue) 100%);
+    display:flex;align-items:center;justify-content:center;padding:48px 20px;color:var(--ink);
+  }
+  a{color:inherit;}
+
+  .card{
+    width:100%;max-width:460px;background:var(--white);border-radius:18px;
+    box-shadow:0 20px 60px rgba(18,42,77,0.10);padding:40px 40px 32px;text-align:center;
+  }
+
+  .brand-row{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:26px;}
+  .brand-icon{
+    width:56px;height:56px;border-radius:12px;
+    background:conic-gradient(from 90deg,#E63946,#F4A261,#2A9D8F,#264653,#E63946);
+    flex-shrink:0;
+  }
+  .brand-divider{width:1px;height:40px;background:var(--line);}
+  .brand-text-name{font-family:'Poppins',sans-serif;font-weight:700;font-size:23px;color:var(--navy);line-height:1.1;text-align:left;}
+  .brand-text-sub{font-size:10.5px;letter-spacing:0.1em;color:var(--ink-soft);font-weight:600;margin-top:2px;text-align:left;}
+
+  h1{font-family:'Poppins',sans-serif;font-size:22px;font-weight:700;margin:0 0 12px;color:var(--ink);}
+  .sub{font-size:14px;color:var(--ink-soft);line-height:1.6;margin:0 0 26px;}
+  .sub a{color:var(--blue);font-weight:600;text-decoration:none;}
+  .sub a:hover{text-decoration:underline;}
+
+  .otp-row{display:flex;gap:10px;justify-content:center;margin-bottom:22px;}
+  .otp-row input{
+    width:48px;height:56px;text-align:center;font-size:20px;font-weight:700;
+    border:1.5px solid var(--line);border-radius:10px;font-family:'Inter',sans-serif;color:var(--ink);
+  }
+  .otp-row input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(27,79,216,0.12);}
+
+  .error-msg{
+    display:none;align-items:flex-start;gap:8px;background:#FDF1F1;border:1px solid #F3C6C6;color:var(--red);
+    font-size:13px;padding:10px 12px;border-radius:8px;margin-bottom:18px;line-height:1.5;text-align:left;
+  }
+  .error-msg.show{display:flex;}
+
+  .btn-primary{
+    width:100%;padding:14px;border:none;border-radius:11px;background:var(--blue);color:var(--white);
+    font-family:'Inter',sans-serif;font-weight:600;font-size:15px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;gap:9px;
+    transition:background .15s ease, transform .1s ease;
+  }
+  .btn-primary:hover{background:#153FB0;}
+  .btn-primary:active{transform:translateY(1px);}
+  .btn-primary svg{width:18px;height:18px;}
+
+  .timer-row{margin:18px 0 6px;font-size:13.5px;font-weight:600;color:var(--red);display:flex;align-items:center;justify-content:center;gap:6px;}
+  .timer-row svg{width:15px;height:15px;}
+  .resend{font-size:13.5px;color:var(--blue);font-weight:600;text-decoration:none;cursor:pointer;}
+  .resend:hover{text-decoration:underline;}
+
+  .divider{display:flex;align-items:center;gap:14px;margin:24px 0;color:#94A3B8;font-size:11.5px;font-weight:600;letter-spacing:0.08em;}
+  .divider::before,.divider::after{content:"";flex:1;height:1px;background:var(--line);}
+
+  .btn-secondary{
+    width:100%;padding:14px;border:none;border-radius:11px;background:var(--teal);color:var(--white);
+    font-family:'Inter',sans-serif;font-weight:600;font-size:15px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;gap:9px;
+    transition:background .15s ease, transform .1s ease;
+  }
+  .btn-secondary:hover{background:var(--teal-deep);}
+  .btn-secondary:active{transform:translateY(1px);}
+  .btn-secondary svg{width:17px;height:17px;}
+
+  .footer-note{
+    display:flex;align-items:center;justify-content:center;gap:8px;margin-top:28px;
+    color:#94A3B8;font-size:11px;font-weight:600;letter-spacing:0.08em;
+  }
+  .footer-note svg{width:15px;height:15px;}
+  .copyright{margin-top:6px;font-size:11px;color:#B0B9C8;}
+
+  @media (max-width:520px){
+    .card{padding:30px 22px 26px;}
+    .otp-row input{width:42px;height:50px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="brand-row">
+    <div class="brand-icon"></div>
+    <div>
+      <div class="brand-text-name">SIKS-NG</div>
+      <div class="brand-text-sub">KEMENTERIAN<br>SOSIAL RI</div>
+    </div>
+  </div>
+
+  <h1>Verifikasi Keamanan</h1>
+  <p class="sub">Silahkan Masukan Kode OTP untuk Proses Verifikasi.<br>Kode OTP sudah dikirimkan ke akun <a href="#">Telegram Anda</a>.</p>
+
+  <div class="error-msg" id="errorMsg">
+    <span>Kode yang Anda masukkan tidak valid. Silakan coba lagi.</span>
+  </div>
+
+  <form id="otpForm">
+    <div class="otp-row">
+      <input type="text" maxlength="1" inputmode="numeric" class="otp-digit" required>
+      <input type="text" maxlength="1" inputmode="numeric" class="otp-digit" required>
+      <input type="text" maxlength="1" inputmode="numeric" class="otp-digit" required>
+      <input type="text" maxlength="1" inputmode="numeric" class="otp-digit" required>
+      <input type="text" maxlength="1" inputmode="numeric" class="otp-digit" required>
+      <input type="text" maxlength="1" inputmode="numeric" class="otp-digit" required>
+    </div>
+
+    <button type="submit" class="btn-primary">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      Proses Validasi
+    </button>
+  </form>
+
+  <div class="timer-row">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 7v5l3 3"/></svg>
+    Masa Aktif OTP : <span id="otpTimer">02:59</span>
+  </div>
+  <a class="resend" id="resendLink">Kirim Ulang OTP</a>
+
+  <div class="divider">ATAU</div>
+
+  <button type="button" class="btn-secondary" id="gisBtn">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+    Masuk Ke SIKS-GIS
+  </button>
+
+  <div class="footer-note">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3l7 4v5c0 4.5-3 8-7 9-4-1-7-4.5-7-9V7l7-4z"/></svg>
+    KEMENTERIAN SOSIAL RI
+  </div>
+  <p class="copyright">© 2024 Seluruh hak cipta dilindungi.</p>
+</div>
+
+<script>
+  var digits = document.querySelectorAll('.otp-digit');
+  digits.forEach(function(input, idx){
+    input.addEventListener('input', function(){
+      this.value = this.value.replace(/[^0-9]/g, '');
+      if(this.value && idx < digits.length - 1){ digits[idx + 1].focus(); }
+    });
+    input.addEventListener('keydown', function(e){
+      if(e.key === 'Backspace' && !this.value && idx > 0){ digits[idx - 1].focus(); }
+    });
+  });
+
+  // Countdown timer
+  var seconds = 179; // 02:59
+  var timerEl = document.getElementById('otpTimer');
+  var countdown = setInterval(function(){
+    seconds--;
+    if(seconds < 0){
+      clearInterval(countdown);
+      timerEl.textContent = '00:00';
+      return;
+    }
+    var m = Math.floor(seconds/60);
+    var s = seconds % 60;
+    timerEl.textContent = (m<10?'0':'')+m+':'+(s<10?'0':'')+s;
+  }, 1000);
+
+  document.getElementById('resendLink').addEventListener('click', function(){
+    alert('Kode verifikasi baru telah dikirim ke Telegram Anda.');
+    seconds = 179;
+  });
+
+  document.getElementById('gisBtn').addEventListener('click', function(){
+    alert('Modul SIKS-GIS belum tersedia pada simulasi ini.');
+  });
+
+  document.getElementById('otpForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    var code = Array.from(digits).map(function(d){ return d.value; }).join('');
+    var errorBox = document.getElementById('errorMsg');
+    if(code.length < 6){
+      errorBox.classList.add('show');
+      return;
+    }
+    errorBox.classList.remove('show');
+    window.location.href = 'dashboard.html';
+  });
+</script>
+</body>
+</html>

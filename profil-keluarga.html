@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIKS-NG | Profil Keluarga</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0F2A5C; --navy-deep:#0B1D38; --blue:#1B4FD8;
+    --bg:#F4F6FA; --ink:#1E293B; --ink-soft:#64748B; --line:#E5E9F0;
+    --white:#FFFFFF; --green:#16A34A; --green-soft:#DCFCE7;
+    --amber:#B45309; --amber-soft:#FEF3E2;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);}
+  a{color:inherit;text-decoration:none;}
+
+  .app{display:grid;grid-template-columns:240px 1fr;min-height:100vh;}
+
+  .sidenav{background:var(--white);border-right:1px solid var(--line);padding:26px 18px;}
+  .brand{display:flex;align-items:center;gap:10px;padding:0 6px 26px;border-bottom:1px solid var(--line);margin-bottom:18px;}
+  .brand-mark{
+    width:38px;height:38px;border-radius:10px;
+    background:conic-gradient(from 90deg,#E63946,#F4A261,#2A9D8F,#264653,#E63946);
+    flex-shrink:0;
+  }
+  .brand-name{font-weight:700;font-size:16px;color:var(--navy);}
+  .brand-sub{font-size:9.5px;color:var(--ink-soft);letter-spacing:0.08em;font-weight:600;}
+
+  .nav-item{
+    display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:9px;
+    font-size:13.5px;font-weight:500;color:var(--ink-soft);margin-bottom:3px;
+  }
+  .nav-item svg{width:17px;height:17px;flex-shrink:0;}
+  .nav-item.active{background:#DCEEFB;color:var(--blue);font-weight:600;}
+  .nav-item:hover:not(.active){background:#F4F6FA;}
+
+  .main{display:flex;flex-direction:column;min-height:100vh;}
+  .topbar{
+    background:linear-gradient(90deg,var(--navy-deep) 0%, var(--blue) 100%);
+    padding:16px 32px;display:flex;align-items:center;justify-content:flex-end;gap:20px;
+  }
+  .icon-btn{
+    width:36px;height:36px;border-radius:9px;background:rgba(255,255,255,0.12);
+    display:flex;align-items:center;justify-content:center;color:var(--white);position:relative;
+  }
+  .icon-btn svg{width:17px;height:17px;}
+  .dot-badge{position:absolute;top:6px;right:7px;width:6px;height:6px;border-radius:50%;background:#EF4444;}
+  .user-chip{display:flex;align-items:center;gap:8px;color:var(--white);font-size:13.5px;font-weight:600;}
+  .user-avatar{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.25);}
+
+  .content{padding:28px 32px;flex:1;}
+  .breadcrumb{font-size:13px;color:var(--ink-soft);margin-bottom:8px;}
+  .breadcrumb .current{color:var(--blue);font-weight:600;}
+
+  .page-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:14px;}
+  .page-head h1{font-size:26px;font-weight:700;margin:0 0 6px;color:var(--ink);}
+  .page-head p{margin:0;font-size:13.5px;color:var(--ink-soft);}
+  .head-actions{display:flex;gap:10px;}
+  .btn-outline{
+    display:flex;align-items:center;gap:8px;padding:10px 16px;border-radius:9px;
+    border:1.5px solid var(--line);background:var(--white);font-size:13.5px;font-weight:600;color:var(--ink);cursor:pointer;
+  }
+  .btn-outline svg{width:15px;height:15px;}
+  .btn-solid{
+    display:flex;align-items:center;gap:8px;padding:10px 16px;border-radius:9px;border:none;
+    background:var(--navy);color:var(--white);font-size:13.5px;font-weight:600;cursor:pointer;
+  }
+  .btn-solid svg{width:15px;height:15px;}
+
+  .grid-top{display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-bottom:24px;}
+
+  .card{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:26px;}
+
+  .family-card{display:grid;grid-template-columns:200px 1fr;gap:26px;}
+  .family-photo{width:100%;border-radius:12px;object-fit:cover;height:150px;background:#E8DCC4;}
+  .info-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+  .info-label{font-size:11px;letter-spacing:0.06em;color:var(--ink-soft);font-weight:600;margin-bottom:4px;text-transform:uppercase;}
+  .info-value{font-size:15px;font-weight:600;color:var(--ink);}
+  .badge-dtks{
+    display:inline-flex;align-items:center;gap:6px;background:#DCEEFB;color:var(--blue);
+    font-size:12.5px;font-weight:700;padding:6px 14px;border-radius:20px;margin-top:6px;
+  }
+  .hr{border:none;border-top:1px solid var(--line);margin:16px 0;}
+
+  .side-cards{display:flex;flex-direction:column;gap:16px;}
+  .stat-card-blue{
+    background:linear-gradient(135deg,var(--blue),#1739A0);color:var(--white);border-radius:14px;padding:20px;
+  }
+  .stat-card-blue .lbl{font-size:12px;opacity:0.85;margin:0 0 6px;font-weight:600;}
+  .stat-card-blue .val{font-size:24px;font-weight:700;margin:0 0 8px;}
+  .stat-card-blue .delta{font-size:12px;background:rgba(255,255,255,0.18);display:inline-block;padding:4px 10px;border-radius:20px;}
+
+  .stat-card-gray{background:#F4F6FA;border:1px solid var(--line);border-radius:14px;padding:20px;}
+  .stat-card-gray .lbl{font-size:11px;letter-spacing:0.06em;color:var(--ink-soft);font-weight:700;text-transform:uppercase;margin:0 0 12px;}
+  .program-pills{display:flex;gap:8px;}
+  .pill{
+    width:34px;height:24px;border-radius:6px;color:var(--white);font-size:9.5px;font-weight:700;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .pill.pkh{background:#0D9488;}
+  .pill.bpnt{background:#92400E;}
+  .pill.pbi{background:#1D4ED8;}
+
+  .grid-bottom{display:grid;grid-template-columns:2fr 1fr;gap:20px;}
+
+  .section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+  .section-head h2{font-size:16px;font-weight:700;margin:0;display:flex;align-items:center;gap:8px;}
+  .section-head h2 svg{width:18px;height:18px;color:var(--ink-soft);}
+  .section-head a{color:var(--blue);font-size:13px;font-weight:600;}
+
+  .member-row{
+    display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--line);
+  }
+  .member-row:last-child{border-bottom:none;}
+  .member-avatar{
+    width:38px;height:38px;border-radius:50%;background:#E8ECF3;display:flex;align-items:center;justify-content:center;
+    color:var(--ink-soft);flex-shrink:0;
+  }
+  .member-avatar svg{width:20px;height:20px;}
+  .member-fields{display:grid;grid-template-columns:1.2fr 1fr 1fr 1fr auto;gap:12px;flex:1;align-items:center;}
+  .m-label{font-size:10.5px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:2px;}
+  .m-value{font-size:13.5px;font-weight:600;color:var(--ink);}
+  .m-badge{
+    font-size:11.5px;font-weight:700;padding:4px 12px;border-radius:20px;background:var(--green-soft);color:var(--green);
+    display:inline-flex;align-items:center;gap:4px;
+  }
+
+  .asset-row{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--line);}
+  .asset-row:last-child{border-bottom:none;}
+  .asset-icon{width:34px;height:34px;border-radius:9px;background:#F4F6FA;display:flex;align-items:center;justify-content:center;color:var(--ink-soft);flex-shrink:0;}
+  .asset-icon svg{width:17px;height:17px;}
+  .asset-text .a-label{font-size:10.5px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:0.04em;}
+  .asset-text .a-value{font-size:13.5px;font-weight:600;}
+  .asset-check{margin-left:auto;color:var(--green);}
+  .asset-check svg{width:18px;height:18px;}
+
+  .note-box{background:#F4F6FA;border-radius:10px;padding:14px;font-size:12.5px;color:var(--ink-soft);line-height:1.6;margin:14px 0;}
+
+  .btn-block{
+    width:100%;padding:12px;border:none;border-radius:9px;background:var(--navy);color:var(--white);
+    font-size:13.5px;font-weight:600;cursor:pointer;
+  }
+
+  .analysis-box{
+    background:linear-gradient(135deg,var(--navy-deep),var(--blue));color:var(--white);border-radius:14px;padding:20px;margin-top:16px;
+  }
+  .analysis-box h3{margin:0 0 10px;font-size:14.5px;font-weight:700;}
+  .analysis-box p{margin:0 0 14px;font-size:12.5px;line-height:1.6;opacity:0.9;}
+  .tag-row{display:flex;gap:8px;flex-wrap:wrap;}
+  .tag{background:rgba(255,255,255,0.15);font-size:10.5px;font-weight:700;padding:6px 10px;border-radius:8px;}
+
+  table{width:100%;border-collapse:collapse;margin-top:6px;}
+  thead th{
+    text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-soft);
+    font-weight:700;padding:10px 6px;border-bottom:2px solid var(--line);
+  }
+  tbody td{padding:13px 6px;font-size:13.5px;border-bottom:1px solid var(--line);}
+  tbody tr:last-child td{border-bottom:none;}
+  .dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:6px;}
+  .dot.teal{background:#0D9488;}
+  .dot.brown{background:#92400E;}
+  .dot.blue{background:#1D4ED8;}
+  .status-chip{font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;background:#DCEEFB;color:var(--blue);}
+
+  footer{text-align:center;padding:20px;font-size:12px;color:var(--ink-soft);}
+
+  @media (max-width:1000px){
+    .app{grid-template-columns:1fr;}
+    .sidenav{display:none;}
+    .grid-top,.grid-bottom{grid-template-columns:1fr;}
+    .family-card{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <aside class="sidenav">
+    <div class="brand">
+      <div class="brand-mark"></div>
+      <div>
+        <div class="brand-name">SIKS-NG</div>
+        <div class="brand-sub">SISTEM INFORMASI<br>KESEJAHTERAAN SOSIAL</div>
+      </div>
+    </div>
+    <div class="nav-item">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l9-9 9 9M5 10v10h14V10"/></svg>
+      Dashboard
+    </div>
+    <div class="nav-item">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m5-4.13a4 4 0 100-8 4 4 0 000 8zm6 5c0-2.21-2.686-4-6-4s-6 1.79-6 4"/></svg>
+      View DTSEN
+    </div>
+    <div class="nav-item active">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 12a4 4 0 100-8 4 4 0 000 8zm-7 8a7 7 0 0114 0"/></svg>
+      Family Profile
+    </div>
+    <div class="nav-item">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m-9 4a1 1 0 100 2 1 1 0 000-2zm9 0a1 1 0 100 2 1 1 0 000-2z"/></svg>
+      Program SEMBAKO
+    </div>
+    <div class="nav-item">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V6m0 10v2m9-6a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      Program PKH
+    </div>
+    <div class="nav-item">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+      PBI-JKN
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="icon-btn">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 10-12 0v3.2a2 2 0 01-.6 1.4L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+        <span class="dot-badge"></span>
+      </div>
+      <div class="user-chip">
+        <div class="user-avatar"></div>
+        Admin Petugas
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+      </div>
+    </header>
+
+    <div class="content">
+      <div class="breadcrumb">Manajemen Data &nbsp;›&nbsp; <span class="current">Profil Keluarga</span></div>
+
+      <div class="page-head">
+        <div>
+          <h1>Profil Keluarga: Rafli Al Rahman</h1>
+          <p>Status verifikasi terakhir: 12 Oktober 2023 oleh Petugas Kelurahan</p>
+        </div>
+        <div class="head-actions">
+          <button class="btn-outline">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 9V4h12v5M6 18H4a1 1 0 01-1-1v-5a1 1 0 011-1h16a1 1 0 011 1v5a1 1 0 01-1 1h-2M6 14h12v7H6v-7z"/></svg>
+            Print Profil
+          </button>
+          <button class="btn-solid">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+            Update Data
+          </button>
+        </div>
+      </div>
+
+      <div class="grid-top">
+        <div class="card family-card">
+          <img class="family-photo" src="https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=400&q=60" alt="Foto rumah">
+          <div>
+            <div class="info-row">
+              <div>
+                <div class="info-label">Kepala Keluarga</div>
+                <div class="info-value">Siti Rahma</div>
+              </div>
+              <div>
+                <div class="info-label">No. Kartu Keluarga</div>
+                <div class="info-value">3201020304050001</div>
+              </div>
+            </div>
+            <div class="info-label">Status DTKS</div>
+            <div class="badge-dtks">★ TERDAFTAR (DESIL 1)</div>
+            <hr class="hr">
+            <div class="info-row">
+              <div>
+                <div class="info-label">Provinsi</div>
+                <div class="info-value">DKI Jakarta</div>
+              </div>
+              <div>
+                <div class="info-label">Kabupaten/Kota</div>
+                <div class="info-value">Jakarta Pusat</div>
+              </div>
+            </div>
+            <div class="info-row">
+              <div>
+                <div class="info-label">Kecamatan</div>
+                <div class="info-value">Menteng</div>
+              </div>
+              <div>
+                <div class="info-label">Kelurahan</div>
+                <div class="info-value">Menteng</div>
+              </div>
+            </div>
+            <div class="info-label">Alamat</div>
+            <div class="info-value">Jl. Mawar No. 12, RT 004/002</div>
+          </div>
+        </div>
+
+        <div class="side-cards">
+          <div class="stat-card-blue">
+            <p class="lbl">Total Bantuan Tahun Ini</p>
+            <p class="val">Rp 3.450.000</p>
+            <span class="delta">↑ 15% dari tahun lalu</span>
+          </div>
+          <div class="stat-card-gray">
+            <p class="lbl">Program Aktif</p>
+            <div class="program-pills">
+              <div class="pill pkh">PKH</div>
+              <div class="pill bpnt">BPN</div>
+              <div class="pill pbi">PBI</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-bottom">
+        <div>
+          <div class="card" style="margin-bottom:20px;">
+            <div class="section-head">
+              <h2>
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m5-4.13a4 4 0 100-8 4 4 0 000 8zm6 5c0-2.21-2.686-4-6-4s-6 1.79-6 4"/></svg>
+                Anggota Keluarga (4 Orang)
+              </h2>
+              <a href="#">Lihat Semua</a>
+            </div>
+
+            <div class="member-row">
+              <div class="member-avatar">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14c-4.4 0-8 2.2-8 5v1h16v-1c0-2.8-3.6-5-8-5z"/></svg>
+              </div>
+              <div class="member-fields">
+                <div><div class="m-label">Nama Lengkap</div><div class="m-value">Siti Rahma</div></div>
+                <div><div class="m-label">Hubungan</div><div class="m-value">Kepala Keluarga</div></div>
+                <div><div class="m-label">NIK</div><div class="m-value">32010...2001</div></div>
+                <div><div class="m-label">Pekerjaan</div><div class="m-value">Pedagang Kecil</div></div>
+                <span class="m-badge">Aktif ▾</span>
+              </div>
+            </div>
+
+            <div class="member-row">
+              <div class="member-avatar">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14c-4.4 0-8 2.2-8 5v1h16v-1c0-2.8-3.6-5-8-5z"/></svg>
+              </div>
+              <div class="member-fields">
+                <div><div class="m-label">Nama Lengkap</div><div class="m-value">Budi Hartono</div></div>
+                <div><div class="m-label">Hubungan</div><div class="m-value">Anak (22th)</div></div>
+                <div><div class="m-label">NIK</div><div class="m-value">32010...4002</div></div>
+                <div><div class="m-label">Pekerjaan</div><div class="m-value">Buruh Harian</div></div>
+                <span class="m-badge">Aktif ▾</span>
+              </div>
+            </div>
+
+            <div class="member-row">
+              <div class="member-avatar">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14c-4.4 0-8 2.2-8 5v1h16v-1c0-2.8-3.6-5-8-5z"/></svg>
+              </div>
+              <div class="member-fields">
+                <div><div class="m-label">Nama Lengkap</div><div class="m-value">Ani Lestari</div></div>
+                <div><div class="m-label">Hubungan</div><div class="m-value">Anak (15th)</div></div>
+                <div><div class="m-label">NIK</div><div class="m-value">32010...8003</div></div>
+                <div><div class="m-label">Pendidikan</div><div class="m-value">SMP</div></div>
+                <span class="m-badge" style="background:#FEF3E2;color:#B45309;">Sekolah ▾</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="section-head">
+              <h2>
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v8m-4-5v5m8-9v9M5 21h14a2 2 0 002-2V8.414a2 2 0 00-.586-1.414l-4.414-4.414A2 2 0 0014.586 2H5a2 2 0 00-2 2v15a2 2 0 002 2z"/></svg>
+                Riwayat Bantuan Sosial (Tahun 2023)
+              </h2>
+            </div>
+            <table>
+              <thead>
+                <tr><th>Tanggal</th><th>Program</th><th>Nilai Bantuan</th><th>Status</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>15 Sep 2023</td>
+                  <td><span class="dot teal"></span>PKH Tahap 3</td>
+                  <td>Rp 750.000</td>
+                  <td><span class="status-chip">Tersalurkan</span></td>
+                </tr>
+                <tr>
+                  <td>02 Sep 2023</td>
+                  <td><span class="dot brown"></span>SEMBAKO (BPNT)</td>
+                  <td>Rp 200.000</td>
+                  <td><span class="status-chip">Tersalurkan</span></td>
+                </tr>
+                <tr>
+                  <td>20 Agt 2023</td>
+                  <td><span class="dot blue"></span>Bantuan Beras 10kg</td>
+                  <td>-</td>
+                  <td><span class="status-chip">Selesai</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="section-head">
+            <h2>
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+              Kondisi Hunian &amp; Aset
+            </h2>
+          </div>
+
+          <div class="asset-row">
+            <div class="asset-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg></div>
+            <div class="asset-text"><div class="a-label">Lantai</div><div class="a-value">Semen/Keramik Sederhana</div></div>
+            <div class="asset-check"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></div>
+          </div>
+          <div class="asset-row">
+            <div class="asset-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l9-9 9 9M5 10v10h14V10"/></svg></div>
+            <div class="asset-text"><div class="a-label">Dinding</div><div class="a-value">Tembok Permanen</div></div>
+            <div class="asset-check"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></div>
+          </div>
+          <div class="asset-row">
+            <div class="asset-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21c-4-4-7-7.5-7-11a7 7 0 0114 0c0 3.5-3 7-7 11z"/></svg></div>
+            <div class="asset-text"><div class="a-label">Air &amp; Sanitasi</div><div class="a-value">Sumur Terlindungi / Pribadi</div></div>
+            <div class="asset-check"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></div>
+          </div>
+          <div class="asset-row">
+            <div class="asset-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></div>
+            <div class="asset-text"><div class="a-label">Daya Listrik</div><div class="a-value">450 VA (Subsidi)</div></div>
+            <div class="asset-check"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></div>
+          </div>
+
+          <div class="note-box">
+            <strong style="color:var(--ink);display:block;margin-bottom:4px;font-size:11px;letter-spacing:0.04em;text-transform:uppercase;">Catatan Tambahan</strong>
+            "Rumah dalam kondisi terawat, namun atap bagian belakang memerlukan perbaikan skala ringan..."
+          </div>
+
+          <button class="btn-block">Klik untuk Detail Aset &amp; Verifikasi</button>
+
+          <div class="analysis-box">
+            <h3>Analisis Kesejahteraan</h3>
+            <p>Keluarga ini masuk dalam kategori 40% ekonomi terbawah. Sangat direkomendasikan untuk berkelanjutan di program PKH Kesehatan.</p>
+            <div class="tag-row">
+              <span class="tag">EKONOMI LEMAH</span>
+              <span class="tag">BUTUH NUTRISI ANAK</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer>© 2023 SIKS Mobile - Sistem Informasi Kesejahteraan Sosial Terintegrasi</footer>
+  </div>
+</div>
+</body>
+</html>

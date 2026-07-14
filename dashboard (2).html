@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIKS-NG | View DTSEN</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0F2A5C; --navy-deep:#0B1D38; --blue:#1B4FD8; --teal:#22A3A0;
+    --bg:#F4F6FA; --ink:#1E293B; --ink-soft:#64748B; --line:#E5E9F0;
+    --white:#FFFFFF; --red:#DC2626;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);}
+  a{color:inherit;text-decoration:none;}
+
+  .app{display:grid;grid-template-columns:230px 1fr;min-height:100vh;}
+
+  /* SIDEBAR */
+  .sidenav{background:var(--white);border-right:1px solid var(--line);padding:20px 16px;display:flex;flex-direction:column;justify-content:space-between;}
+  .user-block{
+    display:flex;align-items:center;gap:10px;background:var(--blue);color:var(--white);
+    border-radius:10px;padding:12px 14px;margin-bottom:18px;
+  }
+  .user-block svg{width:20px;height:20px;flex-shrink:0;}
+  .user-block span{font-size:13.5px;font-weight:700;}
+
+  .nav-item{
+    display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:9px;
+    font-size:13.5px;font-weight:500;color:var(--ink-soft);margin-bottom:3px;cursor:pointer;
+  }
+  .nav-item svg{width:17px;height:17px;flex-shrink:0;}
+  .nav-item.active{background:#D9F2F0;color:var(--teal);font-weight:700;}
+  .nav-item:hover:not(.active){background:#F4F6FA;}
+
+  .verify-btn{
+    background:var(--navy);color:var(--white);border-radius:9px;padding:13px;text-align:center;
+    font-size:13.5px;font-weight:700;margin:16px 0;cursor:pointer;
+  }
+
+  .sidenav-bottom{border-top:1px solid var(--line);padding-top:10px;}
+
+  /* TOP BAR */
+  .main{display:flex;flex-direction:column;min-height:100vh;}
+  .topbar{
+    background:linear-gradient(90deg,var(--navy-deep) 0%, var(--blue) 100%);
+    padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:56px;
+  }
+  .topbar-tabs{display:flex;gap:26px;height:100%;}
+  .topbar-tab{
+    display:flex;align-items:center;height:100%;color:rgba(255,255,255,0.7);font-size:13.5px;font-weight:600;
+    border-bottom:2px solid transparent;cursor:pointer;
+  }
+  .topbar-tab.active{color:var(--white);border-bottom-color:var(--white);}
+  .topbar-icons{display:flex;align-items:center;gap:16px;}
+  .icon-btn{
+    width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,0.12);
+    display:flex;align-items:center;justify-content:center;color:var(--white);position:relative;
+  }
+  .icon-btn svg{width:16px;height:16px;}
+  .avatar-circle{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.25);}
+
+  .content{padding:28px 32px;flex:1;}
+
+  .page-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;}
+  .page-head-left{display:flex;align-items:center;gap:14px;}
+  .page-icon{width:42px;height:42px;border-radius:10px;background:#DCEEFB;color:var(--blue);display:flex;align-items:center;justify-content:center;}
+  .page-icon svg{width:22px;height:22px;}
+  .page-eyebrow{font-size:11px;letter-spacing:0.06em;color:var(--ink-soft);font-weight:700;text-transform:uppercase;}
+  .page-title{font-size:22px;font-weight:700;margin:2px 0 0;}
+  .btn-version{
+    background:var(--navy);color:var(--white);border:none;border-radius:9px;padding:10px 18px;
+    font-size:13px;font-weight:700;cursor:pointer;
+  }
+
+  .card{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:24px;margin-bottom:22px;}
+  .filter-title{display:flex;align-items:center;gap:10px;font-size:16px;font-weight:700;margin:0 0 20px;}
+  .filter-title svg{width:18px;height:18px;color:var(--blue);}
+
+  .filter-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-bottom:18px;}
+  .filter-field label{display:block;font-size:12.5px;font-weight:600;color:var(--ink);margin-bottom:7px;}
+  .filter-field select, .filter-field input{
+    width:100%;padding:11px 14px;border:1.5px solid var(--line);border-radius:9px;
+    font-size:13.5px;font-family:'Inter',sans-serif;color:var(--ink);background:var(--white);
+  }
+  .filter-field select:focus, .filter-field input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(27,79,216,0.1);}
+  .char-count{font-size:11px;color:var(--ink-soft);text-align:right;margin-top:4px;}
+
+  .range-row{display:flex;align-items:center;gap:10px;}
+  .range-row input{flex:1;}
+  .range-row span{font-size:13px;color:var(--ink-soft);white-space:nowrap;}
+
+  .checkbox-section{margin:20px 0;}
+  .checkbox-title{font-size:11.5px;letter-spacing:0.06em;color:var(--ink-soft);font-weight:700;text-transform:uppercase;margin-bottom:12px;}
+  .checkbox-row{display:flex;gap:26px;flex-wrap:wrap;}
+  .checkbox-item{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--ink);}
+  .checkbox-item input{width:16px;height:16px;accent-color:var(--blue);}
+
+  .action-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+  .btn-search{
+    display:flex;align-items:center;gap:8px;background:var(--blue);color:var(--white);border:none;
+    border-radius:9px;padding:12px 20px;font-size:13.5px;font-weight:700;cursor:pointer;
+  }
+  .btn-search svg{width:16px;height:16px;}
+  .info-strip{
+    flex:1;display:flex;align-items:center;gap:8px;background:#EAF6FB;color:#0369A1;
+    border-radius:9px;padding:11px 16px;font-size:13px;
+  }
+  .info-strip svg{width:16px;height:16px;flex-shrink:0;}
+  .btn-reset{
+    display:flex;align-items:center;gap:8px;background:#FEF1F1;color:var(--red);border:1.5px solid #F5C2C2;
+    border-radius:9px;padding:11px 18px;font-size:13.5px;font-weight:700;cursor:pointer;
+  }
+  .btn-reset svg{width:15px;height:15px;}
+
+  .table-card{padding:0;overflow:hidden;}
+  .table-head{display:flex;align-items:center;gap:12px;padding:20px 24px;border-bottom:1px solid var(--line);}
+  .table-head-icon{width:38px;height:38px;border-radius:9px;background:#F4F6FA;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .table-head-icon svg{width:19px;height:19px;color:var(--ink-soft);}
+  .table-head h2{font-size:16px;font-weight:700;margin:0 0 2px;color:var(--blue);}
+  .table-head p{font-size:11.5px;color:var(--ink-soft);letter-spacing:0.04em;margin:0;text-transform:uppercase;font-weight:600;}
+
+  table{width:100%;border-collapse:collapse;}
+  thead th{
+    text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-soft);
+    font-weight:700;padding:12px 24px;border-bottom:1px solid var(--line);background:#FAFBFD;
+  }
+  tbody td{padding:14px 24px;font-size:13.5px;border-bottom:1px solid var(--line);}
+
+  .empty-state{padding:60px 24px;text-align:center;}
+  .empty-icon{
+    width:60px;height:60px;border-radius:50%;background:#EEF2F8;color:#94A3B8;
+    display:flex;align-items:center;justify-content:center;margin:0 auto 18px;
+  }
+  .empty-icon svg{width:28px;height:28px;}
+  .empty-state h3{font-size:16px;font-weight:700;margin:0 0 8px;color:var(--ink);}
+  .empty-state p{font-size:13px;color:var(--ink-soft);margin:0;}
+
+  .table-footer{
+    display:flex;align-items:center;justify-content:space-between;padding:16px 24px;
+    border-top:1px solid var(--line);font-size:13px;color:var(--ink-soft);
+  }
+  .rows-select{border:1px solid var(--line);border-radius:7px;padding:5px 8px;font-size:13px;margin-left:6px;}
+  .pager-nav{display:flex;align-items:center;gap:10px;}
+  .pager-nav button{
+    width:28px;height:28px;border-radius:7px;border:1px solid var(--line);background:var(--white);
+    color:var(--ink-soft);cursor:pointer;display:flex;align-items:center;justify-content:center;
+  }
+  .pager-nav button:disabled{opacity:0.4;cursor:not-allowed;}
+
+  @media (max-width:1000px){
+    .app{grid-template-columns:1fr;}
+    .sidenav{display:none;}
+    .filter-grid{grid-template-columns:1fr 1fr;}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <aside class="sidenav">
+    <div>
+      <div class="user-block">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14c-4.4 0-8 2.2-8 5v1h16v-1c0-2.8-3.6-5-8-5z"/></svg>
+        <span>Admin Petugas</span>
+      </div>
+
+      <div class="nav-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l9-9 9 9M5 10v10h14V10"/></svg>
+        Dashboard
+      </div>
+      <div class="nav-item active">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m5-4.13a4 4 0 100-8 4 4 0 000 8zm6 5c0-2.21-2.686-4-6-4s-6 1.79-6 4"/></svg>
+        View DTSEN
+      </div>
+      <div class="nav-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m-9 4a1 1 0 100 2 1 1 0 000-2zm9 0a1 1 0 100 2 1 1 0 000-2z"/></svg>
+        Program SEMBAKO
+      </div>
+      <div class="nav-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+        Program PKH
+      </div>
+      <div class="nav-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        PBI-JKN
+      </div>
+    </div>
+
+    <div>
+      <div class="verify-btn">Verify Data</div>
+      <div class="sidenav-bottom">
+        <div class="nav-item">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          Help Center
+        </div>
+        <div class="nav-item" id="logoutBtn">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+          Logout
+        </div>
+        <div class="nav-item">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l9-9 9 9M5 10v10h14V10"/></svg>
+          Dashboard
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-tabs">
+        <div class="topbar-tab active">View DTSEN</div>
+        <div class="topbar-tab">Reports</div>
+        <div class="topbar-tab">Verification</div>
+      </div>
+      <div class="topbar-icons">
+        <div class="icon-btn"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 10-12 0v3.2a2 2 0 01-.6 1.4L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg></div>
+        <div class="icon-btn"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.99.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3"/></svg></div>
+        <div class="avatar-circle"></div>
+      </div>
+    </header>
+
+    <div class="content">
+      <div class="page-head">
+        <div class="page-head-left">
+          <div class="page-icon">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18M3 9v10a2 2 0 002 2h4M21 9v10a2 2 0 01-2 2h-4"/></svg>
+          </div>
+          <div>
+            <div class="page-eyebrow">Informasi Data</div>
+            <h1 class="page-title">Versi BNBA DTSEN</h1>
+          </div>
+        </div>
+        <button class="btn-version">Versi TW 2 2026</button>
+      </div>
+
+      <div class="card">
+        <div class="filter-title">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4h18M6 8h12M9 12h6M11 16h2"/></svg>
+          Filter Data View DTSEN
+        </div>
+
+        <div class="filter-grid">
+          <div class="filter-field">
+            <label>Provinsi</label>
+            <select><option>Pilih Provinsi</option><option>DKI Jakarta</option><option>Jawa Timur</option><option>Sumatera Barat</option></select>
+          </div>
+          <div class="filter-field">
+            <label>Kabupaten/Kota</label>
+            <select><option>Pilih Kabupaten/Kota</option></select>
+          </div>
+          <div class="filter-field">
+            <label>Kecamatan</label>
+            <select><option>Pilih Kecamatan</option></select>
+          </div>
+          <div class="filter-field">
+            <label>Kelurahan/Desa</label>
+            <select><option>Pilih Kelurahan/Desa</option></select>
+          </div>
+        </div>
+
+        <div class="filter-grid">
+          <div class="filter-field">
+            <label>NIK</label>
+            <input type="text" maxlength="16" placeholder="Masukkan NIK" id="nikInput">
+            <div class="char-count"><span id="nikCount">0</span>/16</div>
+          </div>
+          <div class="filter-field">
+            <label>No KK</label>
+            <input type="text" maxlength="16" placeholder="Masukkan No KK" id="kkInput">
+            <div class="char-count"><span id="kkCount">0</span>/16</div>
+          </div>
+          <div class="filter-field">
+            <label>Desil</label>
+            <select><option>Semua Desil</option><option>Desil 1</option><option>Desil 2</option><option>Desil 3</option></select>
+          </div>
+          <div class="filter-field">
+            <label>Jenis Disabilitas</label>
+            <select><option>Semua Jenis</option><option>Tidak Ada</option><option>Fisik</option><option>Mental</option></select>
+          </div>
+        </div>
+
+        <div class="filter-grid" style="grid-template-columns:1fr 1fr;">
+          <div class="filter-field">
+            <label>Status Bansos</label>
+            <select><option>Semua Status</option><option>Aktif</option><option>Tidak Aktif</option></select>
+          </div>
+          <div class="filter-field">
+            <label>Rentang Umur</label>
+            <div class="range-row">
+              <input type="number" placeholder="Awal">
+              <span>sampai</span>
+              <input type="number" placeholder="Akhir">
+            </div>
+          </div>
+        </div>
+
+        <div class="checkbox-section">
+          <div class="checkbox-title">Program Bansos Aktif</div>
+          <div class="checkbox-row">
+            <label class="checkbox-item"><input type="checkbox"> PBI</label>
+            <label class="checkbox-item"><input type="checkbox"> SEMBAKO</label>
+            <label class="checkbox-item"><input type="checkbox"> PKH</label>
+            <label class="checkbox-item"><input type="checkbox"> YAPI</label>
+            <label class="checkbox-item"><input type="checkbox"> PENA</label>
+          </div>
+        </div>
+
+        <div class="action-row">
+          <button class="btn-search" id="searchBtn">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path stroke-linecap="round" d="M21 21l-4.3-4.3"/></svg>
+            Cari Data
+          </button>
+          <div class="info-strip" id="infoStrip">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            Silahkan lengkapi filter terlebih dahulu untuk memulai pencarian.
+          </div>
+          <button class="btn-reset" id="resetBtn">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12a7.5 7.5 0 0113-5.1M19.5 12a7.5 7.5 0 01-13 5.1M18.5 4v3.5H15M5.5 20v-3.5H9"/></svg>
+            Reset Filter
+          </button>
+        </div>
+      </div>
+
+      <div class="card table-card">
+        <div class="table-head">
+          <div class="table-head-icon">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m5-4.13a4 4 0 100-8 4 4 0 000 8zm6 5c0-2.21-2.686-4-6-4s-6 1.79-6 4"/></svg>
+          </div>
+          <div>
+            <h2>Data Tunggal Sosial dan Ekonomi Nasional</h2>
+            <p>Kabupaten / Kota Administrasi</p>
+          </div>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>No</th><th>No KK</th><th>Nama Kepala Keluarga</th><th>Alamat</th>
+              <th>Desil Kesejahteraan</th><th>Status Keaktifan</th><th>Aksi</th>
+            </tr>
+          </thead>
+        </table>
+
+        <div class="empty-state" id="emptyState">
+          <div class="empty-icon">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path stroke-linecap="round" d="M21 21l-4.3-4.3"/></svg>
+          </div>
+          <h3>Data Tidak Ditemukan</h3>
+          <p>Gunakan filter di atas untuk menampilkan hasil pencarian data DTSEN.</p>
+        </div>
+
+        <div class="table-footer">
+          <div>Rows per page: <select class="rows-select"><option>10</option><option>25</option><option>50</option></select></div>
+          <div>0–0 of 0</div>
+          <div class="pager-nav">
+            <button disabled><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg></button>
+            <button disabled><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.getElementById('nikInput').addEventListener('input', function(){
+    this.value = this.value.replace(/[^0-9]/g,'');
+    document.getElementById('nikCount').textContent = this.value.length;
+  });
+  document.getElementById('kkInput').addEventListener('input', function(){
+    this.value = this.value.replace(/[^0-9]/g,'');
+    document.getElementById('kkCount').textContent = this.value.length;
+  });
+
+  document.getElementById('resetBtn').addEventListener('click', function(){
+    document.querySelectorAll('select').forEach(function(s){ s.selectedIndex = 0; });
+    document.querySelectorAll('input[type="text"], input[type="number"]').forEach(function(i){ i.value=''; });
+    document.querySelectorAll('input[type="checkbox"]').forEach(function(c){ c.checked=false; });
+    document.getElementById('nikCount').textContent = '0';
+    document.getElementById('kkCount').textContent = '0';
+  });
+
+  document.getElementById('searchBtn').addEventListener('click', function(){
+    alert('Simulasi pencarian: data DTSEN akan ditampilkan di sini setelah tersambung ke backend.');
+  });
+
+  document.getElementById('logoutBtn').addEventListener('click', function(){
+    window.location.href = 'index.html';
+  });
+</script>
+</body>
+</html>

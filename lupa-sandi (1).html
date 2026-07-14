@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIKS-NG | Atur Ulang Kata Sandi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#122A4D; --blue:#1B4FD8; --ink:#1E293B; --ink-soft:#64748B;
+    --line:#E2E8F0; --white:#FFFFFF; --green:#16A34A; --green-soft:#EAF7EE;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Inter',sans-serif;min-height:100vh;color:var(--ink);
+    display:flex;align-items:center;justify-content:center;padding:48px 20px;
+    position:relative;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.86), rgba(255,255,255,0.86)),
+      url('https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=1200&q=60');
+    background-size:cover;
+    background-position:center;
+  }
+  a{color:inherit;}
+
+  .card{
+    width:100%;max-width:460px;background:rgba(255,255,255,0.92);border-radius:18px;
+    box-shadow:0 20px 60px rgba(18,42,77,0.12);padding:40px 40px 32px;text-align:center;
+    backdrop-filter:blur(6px);
+  }
+
+  .brand-row{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:26px;}
+  .brand-icon{
+    width:52px;height:52px;border-radius:10px;
+    background:conic-gradient(from 90deg,#E63946,#F4A261,#2A9D8F,#264653,#E63946);
+    flex-shrink:0;
+  }
+  .brand-text{text-align:left;}
+  .brand-text-name{font-family:'Poppins',sans-serif;font-weight:700;font-size:21px;color:var(--navy);line-height:1.1;}
+  .brand-text-sub{font-size:9.5px;letter-spacing:0.08em;color:var(--ink-soft);font-weight:600;margin-top:2px;}
+
+  h1{font-family:'Poppins',sans-serif;font-size:22px;font-weight:700;margin:0 0 10px;color:var(--blue);}
+  .sub{font-size:13.5px;color:var(--ink-soft);line-height:1.6;margin:0 0 26px;}
+
+  .field{margin-bottom:20px;text-align:left;}
+  .field label{display:block;font-size:13.5px;font-weight:600;color:var(--ink);margin-bottom:8px;}
+  .input-wrap{position:relative;}
+  .input-wrap input{
+    width:100%;padding:13px 16px 13px 42px;border:1.5px solid var(--line);border-radius:10px;
+    font-size:14px;font-family:'Inter',sans-serif;color:var(--ink);background:var(--white);
+  }
+  .input-wrap input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(27,79,216,0.12);}
+  .input-wrap svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--ink-soft);}
+
+  .captcha-box{
+    background:#F7FAFC;border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:20px;text-align:left;
+  }
+  .captcha-title{font-size:11.5px;letter-spacing:0.06em;color:var(--ink-soft);font-weight:700;text-transform:uppercase;display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+  .captcha-refresh{background:none;border:none;cursor:pointer;color:var(--blue);display:flex;align-items:center;justify-content:center;transition:transform .3s ease;}
+  .captcha-refresh:hover{transform:rotate(90deg);}
+  .captcha-refresh svg{width:17px;height:17px;}
+  .captcha-row{display:flex;gap:10px;align-items:stretch;}
+  .captcha-code{
+    font-family:'Poppins',sans-serif;font-weight:700;font-style:italic;font-size:19px;letter-spacing:0.25em;
+    background:var(--white);border:1px solid var(--line);border-radius:9px;
+    padding:10px 16px;flex:1.3;display:flex;align-items:center;justify-content:center;color:var(--ink);user-select:none;
+  }
+  .captcha-input{
+    flex:1;border:1px solid var(--line);border-radius:9px;font-size:14px;
+    padding:0 12px;color:var(--ink);
+  }
+  .captcha-check{
+    width:46px;border:none;border-radius:9px;background:var(--green);color:var(--white);
+    display:flex;align-items:center;justify-content:center;cursor:default;flex-shrink:0;
+  }
+  .captcha-check svg{width:18px;height:18px;}
+  .captcha-check.invalid{background:#CBD5E1;}
+
+  .note-box{
+    display:flex;gap:10px;background:#EAF1FB;border-radius:9px;padding:12px 14px;margin-top:12px;
+    font-size:12px;color:#375180;line-height:1.6;text-align:left;
+  }
+  .note-box svg{width:16px;height:16px;flex-shrink:0;margin-top:1px;color:var(--blue);}
+
+  .error-msg{
+    display:none;align-items:flex-start;gap:8px;background:#FDF1F1;border:1px solid #F3C6C6;color:#B3261E;
+    font-size:13px;padding:10px 12px;border-radius:8px;margin-bottom:18px;line-height:1.5;text-align:left;
+  }
+  .error-msg.show{display:flex;}
+  .success-msg{
+    display:none;align-items:flex-start;gap:8px;background:var(--green-soft);border:1px solid #B9E4C6;color:var(--green);
+    font-size:13px;padding:10px 12px;border-radius:8px;margin-bottom:18px;line-height:1.5;text-align:left;
+  }
+  .success-msg.show{display:flex;}
+
+  .btn-primary{
+    width:100%;padding:14px;border:none;border-radius:11px;background:var(--blue);color:var(--white);
+    font-family:'Inter',sans-serif;font-weight:600;font-size:15px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;gap:9px;
+    transition:background .15s ease, transform .1s ease;
+  }
+  .btn-primary:hover{background:#153FB0;}
+  .btn-primary:active{transform:translateY(1px);}
+  .btn-primary svg{width:17px;height:17px;}
+
+  .back-link{
+    display:flex;align-items:center;justify-content:center;gap:6px;
+    font-size:13.5px;color:var(--ink-soft);text-decoration:none;margin-top:20px;
+  }
+  .back-link:hover{color:var(--ink);}
+  .back-link svg{width:15px;height:15px;}
+
+  .footer-note{
+    display:flex;align-items:center;justify-content:center;gap:8px;margin-top:26px;
+    color:#94A3B8;font-size:10.5px;font-weight:700;letter-spacing:0.06em;
+  }
+  .footer-note svg{width:14px;height:14px;}
+
+  @media (max-width:520px){
+    .card{padding:30px 22px 26px;}
+    .captcha-row{flex-wrap:wrap;}
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="brand-row">
+    <div class="brand-icon"></div>
+    <div class="brand-text">
+      <div class="brand-text-name">SIKS-NG</div>
+      <div class="brand-text-sub">SISTEM INFORMASI KESEJAHTERAAN<br>SOSIAL NEXT GENERATION</div>
+    </div>
+  </div>
+
+  <h1>Atur Ulang Kata Sandi</h1>
+  <p class="sub">Silakan masukkan username Anda untuk menerima tautan pengaturan ulang kata sandi.</p>
+
+  <div class="success-msg" id="successMsg">
+    <span>Tautan pemulihan telah dikirim ke kontak terdaftar Anda.</span>
+  </div>
+  <div class="error-msg" id="errorMsg">
+    <span>Username tidak ditemukan atau kode verifikasi salah.</span>
+  </div>
+
+  <form id="resetForm">
+    <div class="field">
+      <label for="username">Username</label>
+      <div class="input-wrap">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14c-4.4 0-8 2.2-8 5v1h16v-1c0-2.8-3.6-5-8-5z"/></svg>
+        <input type="text" id="username" placeholder="Masukkan ID Pengguna" required>
+      </div>
+    </div>
+
+    <div class="captcha-box">
+      <div class="captcha-title">
+        Verifikasi Keamanan
+        <button type="button" class="captcha-refresh" id="captchaRefresh" aria-label="Muat ulang kode">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12a7.5 7.5 0 0113-5.1M19.5 12a7.5 7.5 0 01-13 5.1M18.5 4v3.5H15M5.5 20v-3.5H9"/></svg>
+        </button>
+      </div>
+      <div class="captcha-row">
+        <span class="captcha-code" id="captchaCode">H7K9R</span>
+        <input type="text" class="captcha-input" id="captchaInput" placeholder="Hasil" autocomplete="off">
+        <div class="captcha-check" id="captchaCheck">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+        </div>
+      </div>
+      <div class="note-box">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3l7 4v5c0 4.5-3 8-7 9-4-1-7-4.5-7-9V7l7-4z"/></svg>
+        <span>Keamanan Terjamin. Tautan untuk mengatur ulang kata sandi akan dikirimkan ke kontak yang terdaftar pada sistem.</span>
+      </div>
+    </div>
+
+    <button type="submit" class="btn-primary">
+      Verifikasi User
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+    </button>
+  </form>
+
+  <a class="back-link" href="index.html">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+    Kembali ke Halaman Login
+  </a>
+
+  <div class="footer-note">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 21h18M5 21V7l8-4v18M13 21V11l6 3v7M9 9v.01M9 12v.01M9 15v.01"/></svg>
+    KEMENTERIAN SOSIAL REPUBLIK INDONESIA
+  </div>
+</div>
+
+<script>
+  var chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  function generateCaptcha(){
+    var code = '';
+    for(var i=0;i<5;i++){ code += chars.charAt(Math.floor(Math.random()*chars.length)); }
+    document.getElementById('captchaCode').textContent = code;
+  }
+
+  document.getElementById('captchaRefresh').addEventListener('click', function(){
+    generateCaptcha();
+    document.getElementById('captchaInput').value = '';
+  });
+
+  document.getElementById('resetForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    var user = document.getElementById('username').value.trim();
+    var captchaInput = document.getElementById('captchaInput').value.trim().toUpperCase();
+    var captchaCode = document.getElementById('captchaCode').textContent;
+    var errorBox = document.getElementById('errorMsg');
+    var successBox = document.getElementById('successMsg');
+
+    if(user === '' || captchaInput !== captchaCode){
+      errorBox.classList.add('show');
+      successBox.classList.remove('show');
+      generateCaptcha();
+      document.getElementById('captchaInput').value = '';
+      return;
+    }
+    errorBox.classList.remove('show');
+    successBox.classList.add('show');
+  });
+</script>
+</body>
+</html>

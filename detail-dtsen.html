@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIKS-NG | Detail Data DTSEN</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0F2A5C; --blue:#1B4FD8; --bg:#F4F6FA; --ink:#1E293B; --ink-soft:#64748B;
+    --line:#E5E9F0; --white:#FFFFFF; --green:#16A34A; --amber:#D97706;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);
+    min-height:100vh;position:relative;
+  }
+  a{color:inherit;}
+
+  .watermark{
+    position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;
+    opacity:0.035;
+  }
+  .watermark-inner{
+    position:absolute;top:-20%;left:-20%;width:140%;height:140%;
+    display:flex;flex-wrap:wrap;gap:60px;transform:rotate(-18deg);
+    font-size:20px;font-weight:700;color:var(--ink);white-space:nowrap;
+  }
+
+  .wrap{max-width:1200px;margin:0 auto;padding:36px 24px;position:relative;z-index:1;}
+
+  .breadcrumb{font-size:13.5px;color:var(--ink-soft);margin-bottom:14px;}
+  .breadcrumb a{color:var(--blue);font-weight:600;}
+  .breadcrumb .current{color:var(--blue);font-weight:600;}
+
+  .page-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:14px;}
+  .page-head h1{font-size:24px;font-weight:700;margin:0;}
+  .page-head h1 .kk{color:var(--blue);}
+  .head-actions{display:flex;gap:10px;}
+  .btn-outline{
+    display:flex;align-items:center;gap:8px;padding:10px 16px;border-radius:9px;
+    border:1.5px solid var(--line);background:var(--white);font-size:13.5px;font-weight:600;color:var(--ink);cursor:pointer;
+  }
+  .btn-outline svg{width:15px;height:15px;}
+  .btn-solid{
+    display:flex;align-items:center;gap:8px;padding:10px 16px;border-radius:9px;border:none;
+    background:var(--blue);color:var(--white);font-size:13.5px;font-weight:600;cursor:pointer;
+  }
+  .btn-solid svg{width:15px;height:15px;}
+
+  .tabs{display:flex;gap:28px;border-bottom:1px solid var(--line);margin-bottom:24px;}
+  .tab{padding:10px 2px;font-size:14px;font-weight:600;color:var(--ink-soft);cursor:pointer;border-bottom:2px solid transparent;}
+  .tab.active{color:var(--blue);border-bottom-color:var(--blue);}
+
+  .card{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:26px;margin-bottom:24px;}
+  .card-title{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:700;margin:0 0 22px;}
+  .card-title svg{width:18px;height:18px;color:var(--blue);background:#DCEEFB;border-radius:50%;padding:3px;box-sizing:content-box;}
+
+  .info-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;}
+  .info-grid + .info-grid{margin-top:20px;}
+  .info-label{font-size:11px;letter-spacing:0.05em;color:var(--ink-soft);font-weight:600;text-transform:uppercase;margin-bottom:6px;}
+  .info-value{font-size:14.5px;font-weight:700;color:var(--ink);}
+
+  .section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+  .section-head h2{font-size:17px;font-weight:700;margin:0;}
+  .member-badge{background:#DCEEFB;color:var(--blue);font-size:12.5px;font-weight:700;padding:6px 14px;border-radius:20px;}
+
+  table{width:100%;border-collapse:collapse;}
+  thead th{
+    text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-soft);
+    font-weight:700;padding:12px 8px;border-bottom:1px solid var(--line);background:#FAFBFD;
+  }
+  tbody td{padding:16px 8px;font-size:14px;border-bottom:1px solid var(--line);color:var(--ink);}
+  tbody tr:last-child td{border-bottom:none;}
+  .nik-copy{display:inline-flex;align-items:center;gap:6px;}
+  .nik-copy svg{width:14px;height:14px;color:var(--ink-soft);cursor:pointer;}
+  .muted{color:var(--ink-soft);}
+  .action-icons{display:flex;gap:8px;align-items:center;}
+  .icon-circle{
+    width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--ink-soft);
+  }
+  .icon-circle svg{width:16px;height:16px;}
+  .icon-circle.green{background:var(--green);color:var(--white);}
+  .icon-circle.orange{background:#EA580C;color:var(--white);}
+
+  footer{
+    display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;
+    font-size:12.5px;color:var(--ink-soft);padding:20px 4px 0;border-top:1px solid var(--line);margin-top:10px;
+  }
+  footer a{color:var(--ink-soft);margin-left:14px;}
+
+  @media (max-width:800px){
+    .info-grid{grid-template-columns:1fr 1fr;}
+  }
+</style>
+</head>
+<body>
+
+<div class="watermark">
+  <div class="watermark-inner" id="watermarkInner"></div>
+</div>
+
+<div class="wrap">
+  <div class="breadcrumb">
+    <a href="#">Aplikasi SIKS-NG</a> &nbsp;/&nbsp; <a href="#">Data BNBA</a> &nbsp;/&nbsp; <span class="current">Detail DTSEN</span>
+  </div>
+
+  <div class="page-head">
+    <h1>Detail Data DTSEN No KK : <span class="kk">3518162406240005</span></h1>
+    <div class="head-actions">
+      <button class="btn-outline">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 9V4h12v5M6 18H4a1 1 0 01-1-1v-5a1 1 0 011-1h16a1 1 0 011 1v5a1 1 0 01-1 1h-2M6 14h12v7H6v-7z"/></svg>
+        Cetak Dokumen
+      </button>
+      <button class="btn-solid">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+        Edit Data
+      </button>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active">Data Keluarga</div>
+    <div class="tab">Riwayat Bansos</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      Detail Informasi Keluarga
+    </div>
+
+    <div class="info-grid">
+      <div><div class="info-label">No KK</div><div class="info-value">3518162406240005</div></div>
+      <div><div class="info-label">NIK Kepala Keluarga</div><div class="info-value">3518161404880001</div></div>
+      <div><div class="info-label">Kabupaten</div><div class="info-value">Kab. Nganjuk</div></div>
+      <div><div class="info-label">Kelurahan</div><div class="info-value">Ngangkatan</div></div>
+    </div>
+    <div class="info-grid">
+      <div><div class="info-label">Nama Kepala Keluarga</div><div class="info-value">Nuli Hartono</div></div>
+      <div><div class="info-label">Provinsi</div><div class="info-value">Jawa Timur</div></div>
+      <div><div class="info-label">Kecamatan</div><div class="info-value">Rejoso</div></div>
+      <div><div class="info-label">Alamat</div><div class="info-value">Dusun Jati Sari</div></div>
+    </div>
+  </div>
+
+  <div class="section-head">
+    <h2>Daftar Anggota Keluarga</h2>
+    <span class="member-badge">3 Anggota Terdaftar</span>
+  </div>
+
+  <div class="card" style="padding:0;overflow:hidden;">
+    <table>
+      <thead>
+        <tr><th>NIK</th><th>Nama Lengkap</th><th>Hubungan</th><th>Pekerjaan</th><th>Aksi</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>3518161404880001</td>
+          <td>Nuli Hartono</td>
+          <td>Kepala Keluarga</td>
+          <td>Buruh Harian Lepas</td>
+          <td>
+            <div class="action-icons">
+              <div class="icon-circle"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><circle cx="12" cy="12" r="3"/></svg></div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <span class="nik-copy">351816680723****
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+            </span>
+          </td>
+          <td>Cheryl Lavanya Dee Calista</td>
+          <td>Anak</td>
+          <td class="muted">Belum ditentukan</td>
+          <td>
+            <div class="action-icons">
+              <div class="icon-circle green"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3"/></svg></div>
+              <div class="icon-circle orange"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376C1.83 17.812 2.914 20 4.75 20h14.5c1.836 0 2.92-2.188 1.813-3.874L13.813 3.626c-.921-1.396-2.706-1.396-3.626 0L1.997 16.126zM12 15.75h.007v.008H12v-.008z"/></svg></div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <footer>
+    <span>© 2024 Kementerian Sosial Republik Indonesia &nbsp;·&nbsp; SIKS-Next Generation v2.4.0</span>
+    <span><a href="#">Bantuan</a><a href="#">Kebijakan Privasi</a></span>
+  </footer>
+</div>
+
+<script>
+  var el = document.getElementById('watermarkInner');
+  for(var i=0;i<40;i++){
+    var span = document.createElement('span');
+    span.textContent = 'SIKS-NG | DOKUMEN NEGARA';
+    el.appendChild(span);
+  }
+
+  document.querySelectorAll('.tab').forEach(function(tab){
+    tab.addEventListener('click', function(){
+      document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
+      this.classList.add('active');
+    });
+  });
+
+  document.querySelector('.nik-copy svg').addEventListener('click', function(){
+    alert('NIK lengkap disalin.');
+  });
+</script>
+</body>
+</html>
