@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIKS-NG · BNBA Search Directory</title>
+<style>
+:root{
+  --blue-900:#0f2f66;
+  --blue-800:#13387f;
+  --blue-700:#1a4699;
+  --blue-600:#2557b8;
+  --blue-500:#3b6fd6;
+  --blue-100:#e8eefb;
+  --blue-50:#f4f7fd;
+  --ink:#1c2536;
+  --ink-soft:#5b6478;
+  --line:#e6e9f0;
+  --bg:#eef1f7;
+  --white:#ffffff;
+  --radius-lg:16px;
+  --radius-md:12px;
+  --radius-sm:8px;
+  --shadow:0 1px 2px rgba(16,24,40,.04), 0 8px 24px -12px rgba(16,24,40,.10);
+  font-size:16px;
+}
+
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Roboto,Helvetica,Arial,sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  min-height:100vh;
+}
+svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+button{font-family:inherit;cursor:pointer;}
+
+.app{display:flex;min-height:100vh;}
+
+/* ---------- SIDEBAR ---------- */
+.sidebar{
+  width:76px;
+  background:linear-gradient(180deg,var(--blue-900),var(--blue-700));
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:20px 0;
+  gap:28px;
+  position:sticky;
+  top:0;
+  height:100vh;
+  z-index:40;
+}
+.sidebar-logo{
+  width:44px;height:44px;
+  background:rgba(255,255,255,.12);
+  border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+}
+.sidebar-nav{display:flex;flex-direction:column;gap:10px;width:100%;align-items:center;}
+.nav-item{
+  position:relative;
+  width:46px;height:46px;
+  border:none;border-radius:12px;
+  background:transparent;
+  color:rgba(255,255,255,.65);
+  display:flex;align-items:center;justify-content:center;
+  transition:background .15s, color .15s;
+}
+.nav-item:hover{background:rgba(255,255,255,.10);color:#fff;}
+.nav-item.active{background:#fff;color:var(--blue-700);}
+.nav-item[data-tooltip]::after{
+  content:attr(data-tooltip);
+  position:absolute;left:60px;top:50%;transform:translateY(-50%);
+  background:var(--ink);color:#fff;
+  padding:6px 10px;border-radius:6px;font-size:12px;white-space:nowrap;
+  opacity:0;pointer-events:none;transition:opacity .15s;
+  z-index:50;
+}
+.nav-item:hover::after{opacity:1;}
+
+/* ---------- MAIN / TOPBAR ---------- */
+.main{flex:1;min-width:0;display:flex;flex-direction:column;}
+.topbar{
+  background:var(--white);
+  border-bottom:1px solid var(--line);
+  padding:14px 28px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:30;
+}
+.brand{font-size:20px;font-weight:800;letter-spacing:.2px;}
+.brand-siks{color:var(--blue-700);}
+.brand-dash{color:var(--ink-soft);font-weight:400;}
+.brand-ng{color:#e0501e;}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+.icon-btn{
+  position:relative;
+  width:38px;height:38px;border-radius:10px;border:1px solid var(--line);
+  background:var(--white);color:var(--ink-soft);
+  display:flex;align-items:center;justify-content:center;
+}
+.icon-btn:hover{background:var(--blue-50);color:var(--blue-700);}
+.icon-btn[data-tooltip]::after{
+  content:attr(data-tooltip);
+  position:absolute;right:0;top:44px;
+  background:var(--ink);color:#fff;padding:5px 9px;border-radius:6px;font-size:11px;
+  opacity:0;pointer-events:none;transition:opacity .15s;white-space:nowrap;
+}
+.icon-btn:hover::after{opacity:1;}
+.avatar-btn{
+  width:38px;height:38px;border-radius:50%;border:none;
+  background:var(--blue-100);color:var(--blue-700);
+  display:flex;align-items:center;justify-content:center;
+}
+
+/* ---------- PAGE ---------- */
+.page{padding:28px;max-width:1400px;width:100%;margin:0 auto;}
+.page-head h1{
+  margin:0 0 4px;font-size:32px;font-weight:800;
+  background:linear-gradient(90deg,var(--blue-700),var(--blue-500));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.page-head p{margin:0 0 22px;color:var(--ink-soft);font-size:14.5px;}
+
+.content-grid{
+  display:grid;
+  grid-template-columns:320px 1fr;
+  gap:22px;
+  align-items:start;
+  transition:grid-template-columns .25s ease;
+}
+.content-grid.is-collapsed{grid-template-columns:60px 1fr;}
+
+.panel{
+  background:var(--white);
+  border:1px solid var(--line);
+  border-radius:var(--radius-lg);
+  box-shadow:var(--shadow);
+}
+
+/* ---------- FILTER PANEL ---------- */
+.filter-panel{padding:20px;position:relative;overflow:visible;transition:padding .25s ease;}
+
+.panel-toggle{
+  position:absolute;top:22px;right:-14px;
+  width:28px;height:28px;border-radius:50%;
+  background:var(--white);border:1px solid var(--line);box-shadow:var(--shadow);
+  color:var(--blue-600);display:flex;align-items:center;justify-content:center;
+  z-index:5;transition:transform .25s ease, background .15s;
+}
+.panel-toggle svg{width:14px;height:14px;}
+.panel-toggle:hover{background:var(--blue-600);color:#fff;}
+.filter-panel.collapsed .panel-toggle svg{transform:rotate(180deg);}
+
+.filter-panel.collapsed{padding:20px 8px;}
+.filter-panel.collapsed .panel-title{
+  justify-content:center;margin-bottom:0;
+}
+.filter-panel.collapsed .panel-title-text,
+.filter-panel.collapsed form{display:none;}
+.filter-panel.collapsed .panel-title svg{width:20px;height:20px;color:var(--blue-600);}
+.panel-title{
+  display:flex;align-items:center;gap:8px;
+  font-weight:700;font-size:16px;margin-bottom:16px;color:var(--ink);
+}
+.panel-title svg{color:var(--blue-600);}
+.field{margin-bottom:14px;}
+.field label{
+  display:block;font-size:12.5px;font-weight:600;color:var(--ink-soft);
+  margin-bottom:6px;
+}
+.field select,.field input[type="text"],.field input[type="number"]{
+  width:100%;padding:9px 12px;border:1px solid var(--line);border-radius:var(--radius-sm);
+  font-size:13.5px;color:var(--ink);background:var(--white);
+  outline:none;transition:border-color .15s, box-shadow .15s;
+  appearance:none;
+}
+.field select{
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235b6478' stroke-width='2'><path d='M6 9l6 6 6-6'/></svg>");
+  background-repeat:no-repeat;background-position:right 10px center;background-size:16px;
+  padding-right:32px;
+}
+.field select:disabled{background-color:#f6f7fb;color:#a7adba;cursor:not-allowed;}
+.field select:focus,.field input:focus{
+  border-color:var(--blue-500);box-shadow:0 0 0 3px rgba(59,111,214,.15);
+}
+.input-icon{position:relative;}
+.input-icon svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--ink-soft);width:16px;height:16px;}
+.input-icon input{padding-left:34px;}
+
+.range-row{display:flex;gap:10px;}
+.range-row input{width:100%;}
+
+.chip-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.chip{
+  display:flex;align-items:center;gap:7px;
+  border:1px solid var(--line);border-radius:var(--radius-sm);
+  padding:8px 10px;font-size:13px;cursor:pointer;
+  transition:border-color .15s, background .15s;
+}
+.chip:hover{border-color:var(--blue-400,var(--blue-500));}
+.chip input{accent-color:var(--blue-600);}
+.chip:has(input:checked){background:var(--blue-50);border-color:var(--blue-500);font-weight:600;}
+
+.btn-search{
+  width:100%;display:flex;align-items:center;justify-content:center;gap:8px;
+  background:linear-gradient(90deg,var(--blue-700),var(--blue-500));
+  color:#fff;border:none;border-radius:var(--radius-sm);
+  padding:11px;font-size:14px;font-weight:700;margin-top:6px;
+  box-shadow:0 6px 16px -6px rgba(37,87,184,.55);
+  transition:transform .1s, box-shadow .15s;
+}
+.btn-search:hover{transform:translateY(-1px);box-shadow:0 10px 20px -6px rgba(37,87,184,.6);}
+.btn-search svg{width:16px;height:16px;}
+.btn-reset{
+  width:100%;background:transparent;border:none;color:var(--ink-soft);
+  font-size:12.5px;padding:9px;margin-top:2px;text-decoration:underline;
+}
+.btn-reset:hover{color:var(--blue-700);}
+
+/* ---------- RESULT PANEL ---------- */
+.result-panel{min-height:520px;display:flex;flex-direction:column;}
+.result-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:20px 22px 14px;border-bottom:1px solid var(--line);
+}
+.result-sub{margin:2px 0 0;font-size:12.5px;color:var(--ink-soft);}
+.view-toggle{display:flex;border:1px solid var(--line);border-radius:var(--radius-sm);overflow:hidden;}
+.view-btn{
+  width:34px;height:32px;border:none;background:var(--white);color:var(--ink-soft);
+  display:flex;align-items:center;justify-content:center;
+}
+.view-btn+.view-btn{border-left:1px solid var(--line);}
+.view-btn.active{background:var(--blue-600);color:#fff;}
+.view-btn svg{width:16px;height:16px;}
+
+.result-body{flex:1;padding:22px;}
+.empty-state{
+  height:100%;min-height:380px;
+  border:1.5px dashed var(--line);border-radius:var(--radius-md);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:40px;background:var(--blue-50);
+}
+.empty-icon{
+  width:56px;height:56px;border-radius:50%;
+  background:var(--blue-100);color:var(--blue-600);
+  display:flex;align-items:center;justify-content:center;margin-bottom:16px;
+}
+.empty-icon svg{width:24px;height:24px;}
+.empty-state h3{margin:0 0 6px;font-size:17px;color:var(--ink);}
+.empty-state p{margin:0;max-width:340px;font-size:13px;color:var(--ink-soft);line-height:1.6;}
+
+/* skeleton */
+.skeleton-row{
+  height:56px;border-radius:var(--radius-sm);
+  background:linear-gradient(90deg,#eef1f7 25%,#f6f8fc 37%,#eef1f7 63%);
+  background-size:400% 100%;animation:shimmer 1.3s ease infinite;
+  margin-bottom:10px;
+}
+@keyframes shimmer{0%{background-position:100% 0}100%{background-position:0 0}}
+
+/* table */
+.result-table{width:100%;border-collapse:collapse;font-size:13px;}
+.result-table th{
+  text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;
+  color:var(--ink-soft);padding:10px 12px;border-bottom:1px solid var(--line);
+  background:var(--blue-50);
+}
+.result-table th:first-child{border-top-left-radius:var(--radius-sm);}
+.result-table th:last-child{border-top-right-radius:var(--radius-sm);}
+.result-table td{padding:12px;border-bottom:1px solid var(--line);vertical-align:middle;}
+.result-table tr:last-child td{border-bottom:none;}
+.result-table tr:hover td{background:#fbfcfe;}
+.badge{
+  display:inline-block;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:700;
+}
+.badge.aktif{background:#e6f6ec;color:#1a8a4a;}
+.badge.tidak{background:#fdecec;color:#c73838;}
+.badge.diajukan{background:#fff4e0;color:#b3760f;}
+.prog-pill{
+  display:inline-flex;align-items:center;background:var(--blue-100);color:var(--blue-700);
+  border-radius:6px;padding:2px 7px;font-size:10.5px;font-weight:700;margin:0 4px 4px 0;
+}
+
+/* card view */
+.result-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;}
+.result-card{
+  border:1px solid var(--line);border-radius:var(--radius-md);padding:16px;
+  transition:box-shadow .15s, border-color .15s;
+}
+.result-card:hover{box-shadow:var(--shadow);border-color:var(--blue-500);}
+.result-card h4{margin:0 0 2px;font-size:14.5px;}
+.result-card .nik{font-size:11.5px;color:var(--ink-soft);margin-bottom:10px;}
+.result-card .row{display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:6px;color:var(--ink-soft);}
+.result-card .row b{color:var(--ink);font-weight:600;}
+
+.result-footer{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 22px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-soft);
+}
+
+/* ---------- CLICKABLE ROWS ---------- */
+.result-table tbody tr, .result-card{cursor:pointer;}
+.name-link{color:var(--blue-700);font-weight:700;}
+.name-link:hover{text-decoration:underline;}
+
+/* ---------- DETAIL PANEL ---------- */
+.detail-panel{padding:22px;}
+.detail-topline{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:16px;font-size:12.5px;color:var(--ink-soft);
+}
+.back-link{
+  display:flex;align-items:center;gap:4px;background:none;border:none;
+  color:var(--blue-600);font-weight:700;font-size:13px;padding:0;
+}
+.back-link svg{width:15px;height:15px;}
+.back-link:hover{text-decoration:underline;}
+
+.detail-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:18px;flex-wrap:wrap;}
+.detail-head h2{margin:0 0 6px;font-size:22px;}
+.detail-sub{display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--ink-soft);flex-wrap:wrap;}
+.badge-verif{
+  display:inline-flex;align-items:center;gap:4px;background:#e6f6ec;color:#1a8a4a;
+  padding:3px 10px;border-radius:999px;font-weight:700;font-size:11.5px;
+}
+.detail-actions{display:flex;gap:10px;}
+.btn-ghost, .btn-primary-sm, .btn-ghost-sm{
+  display:flex;align-items:center;gap:6px;border-radius:var(--radius-sm);
+  font-size:12.5px;font-weight:700;padding:9px 14px;border:1px solid var(--line);
+  background:#fff;color:var(--ink);
+}
+.btn-ghost svg, .btn-primary-sm svg, .btn-ghost-sm svg{width:15px;height:15px;}
+.btn-primary-sm{background:linear-gradient(90deg,var(--blue-700),var(--blue-500));color:#fff;border:none;}
+.btn-ghost-sm{background:#fff;color:var(--ink-soft);}
+
+.stat-cards{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;
+}
+.stat-card{
+  border:1px solid var(--line);border-radius:var(--radius-md);padding:14px 16px;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+}
+.stat-card .stat-label{font-size:11.5px;color:var(--ink-soft);margin-bottom:4px;}
+.stat-card .stat-value{font-size:18px;font-weight:800;}
+.stat-card .stat-icon{
+  width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.stat-card .stat-icon svg{width:17px;height:17px;}
+.stat-card.c1 .stat-icon{background:#e8eefb;color:var(--blue-600);}
+.stat-card.c2 .stat-icon{background:#e6f6ec;color:#1a8a4a;}
+.stat-card.c3 .stat-icon{background:#fff4e0;color:#b3760f;}
+.stat-card.c4 .stat-icon{background:#f1e9fb;color:#7b3fbf;}
+
+.detail-grid{display:grid;grid-template-columns:1.7fr 1fr;gap:18px;align-items:start;}
+.detail-col-left, .detail-col-right{display:flex;flex-direction:column;gap:16px;}
+.subpanel{border:1px solid var(--line);border-radius:var(--radius-md);padding:16px;}
+.subpanel-title{font-weight:700;font-size:13.5px;margin-bottom:12px;}
+
+.family-photo{
+  width:100%;height:150px;border-radius:var(--radius-sm);margin-bottom:14px;
+  background:linear-gradient(135deg,var(--blue-700),var(--blue-400,var(--blue-500)));
+  display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.8);
+}
+.family-photo svg{width:34px;height:34px;}
+.fi-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.fi-label{font-size:11px;color:var(--ink-soft);margin-bottom:2px;}
+.fi-value{font-size:13px;}
+.fi-strong{font-weight:700;color:var(--blue-700);}
+.fi-tags{margin-bottom:10px;}
+.tag-desil{
+  display:inline-block;background:#fff4e0;color:#b3760f;font-size:11px;font-weight:700;
+  padding:3px 10px;border-radius:999px;
+}
+
+.table-wrap{overflow-x:auto;}
+.mini-table{width:100%;border-collapse:collapse;font-size:12.5px;}
+.mini-table th{
+  text-align:left;font-size:10.5px;text-transform:uppercase;color:var(--ink-soft);
+  padding:8px 10px;border-bottom:1px solid var(--line);
+}
+.mini-table td{padding:10px;border-bottom:1px solid var(--line);}
+.mini-table tr:last-child td{border-bottom:none;}
+.status-pill{
+  display:inline-block;padding:2px 8px;border-radius:999px;font-size:10.5px;font-weight:700;
+  background:#eef1f7;color:var(--ink-soft);
+}
+.status-pill.selesai{background:#e6f6ec;color:#1a8a4a;}
+.status-pill.proses{background:#fff4e0;color:#b3760f;}
+.row-icon-btn{
+  width:26px;height:26px;border-radius:7px;border:1px solid var(--line);background:#fff;
+  color:var(--blue-600);display:inline-flex;align-items:center;justify-content:center;
+}
+.row-icon-btn svg{width:13px;height:13px;}
+
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.note-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px;}
+.note-list li{font-size:12px;color:var(--ink-soft);border-left:2px solid var(--blue-300,var(--blue-500));padding-left:10px;}
+.note-list li b{display:block;color:var(--ink);font-size:12px;margin-bottom:2px;}
+
+.map-box{
+  height:110px;border-radius:var(--radius-sm);
+  background:repeating-linear-gradient(45deg,#3a4152,#3a4152 10px,#2f3646 10px,#2f3646 20px);
+  position:relative;overflow:hidden;
+}
+.map-pin{
+  position:absolute;top:50%;left:55%;width:14px;height:14px;border-radius:50%;
+  background:#ff5a5a;border:3px solid #fff;transform:translate(-50%,-50%);
+  box-shadow:0 0 0 4px rgba(255,90,90,.25);
+}
+.map-foot{display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:11.5px;color:var(--ink-soft);}
+.map-link{color:var(--blue-600);font-weight:700;text-decoration:none;}
+
+.quick-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.quick-actions button{
+  display:flex;flex-direction:column;align-items:flex-start;gap:8px;
+  border:1px solid var(--line);border-radius:var(--radius-sm);padding:12px;
+  background:#fff;font-size:12px;font-weight:600;color:var(--ink);
+}
+.quick-actions button svg{width:16px;height:16px;color:var(--blue-600);}
+.quick-actions button:hover{border-color:var(--blue-500);background:var(--blue-50);}
+
+.dana-card{
+  background:linear-gradient(120deg,var(--blue-800),var(--blue-600));
+  color:#fff;border:none;position:relative;overflow:hidden;
+}
+.dana-label{font-size:12px;opacity:.85;margin-bottom:6px;}
+.dana-value{font-size:24px;font-weight:800;margin-bottom:4px;}
+.dana-note{font-size:11.5px;opacity:.85;}
+
+.program-pills{display:flex;flex-wrap:wrap;gap:8px;}
+.program-pills .prog-pill{background:var(--blue-100);color:var(--blue-700);font-size:11px;padding:4px 10px;}
+
+.cond-list{list-style:none;margin:0 0 10px;padding:0;display:flex;flex-direction:column;gap:10px;}
+.cond-list li{display:flex;align-items:center;justify-content:space-between;font-size:12.5px;}
+.cond-list li span:first-child{color:var(--ink-soft);}
+.cond-check{color:#1a8a4a;width:16px;height:16px;}
+.cond-note{font-size:11.5px;color:var(--ink-soft);background:var(--blue-50);border-radius:var(--radius-sm);padding:10px;line-height:1.6;}
+
+.analysis-card p{font-size:12.5px;color:var(--ink-soft);line-height:1.6;margin:0 0 14px;}
+.analysis-card b{color:var(--ink);}
+.analysis-actions{display:flex;gap:8px;}
+.analysis-actions button{flex:1;}
+
+/* ---------- MOBILE ---------- */
+.mobile-toggle{
+  display:none;position:fixed;top:14px;left:14px;z-index:60;
+  width:40px;height:40px;border-radius:10px;border:1px solid var(--line);
+  background:var(--white);box-shadow:var(--shadow);color:var(--ink);
+  align-items:center;justify-content:center;
+}
+.overlay{
+  display:none;position:fixed;inset:0;background:rgba(15,20,35,.45);z-index:39;
+}
+.overlay.show{display:block;}
+
+@media (max-width:1024px){
+  .content-grid{grid-template-columns:1fr;}
+  .content-grid.is-collapsed{grid-template-columns:1fr;}
+  .detail-grid{grid-template-columns:1fr;}
+  .stat-cards{grid-template-columns:1fr 1fr;}
+  .two-col{grid-template-columns:1fr;}
+  .panel-toggle{display:none;}
+}
+@media (max-width:800px){
+  .mobile-toggle{display:flex;}
+  .sidebar{
+    position:fixed;left:0;top:0;transform:translateX(-100%);
+    transition:transform .2s ease;
+  }
+  .sidebar.open{transform:translateX(0);}
+  .topbar{padding-left:64px;}
+  .page{padding:18px;}
+  .chip-grid{grid-template-columns:1fr;}
+  .stat-cards{grid-template-columns:1fr;}
+  .quick-actions{grid-template-columns:1fr;}
+}
+
+</style>
+</head>
+<body>
+
+  <!-- Tombol buka sidebar di mobile -->
+  <button class="mobile-toggle" id="mobileToggle" aria-label="Buka menu">
+    <svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+  </button>
+  <div class="overlay" id="overlay"></div>
+
+  <div class="app">
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-logo" title="SIKS-NG">
+        <svg viewBox="0 0 40 40" width="26" height="26">
+          <circle cx="20" cy="20" r="18" fill="none" stroke="#fff" stroke-width="3" stroke-dasharray="18 10" stroke-linecap="round"/>
+          <circle cx="20" cy="20" r="7" fill="#fff"/>
+        </svg>
+      </div>
+      <nav class="sidebar-nav">
+        <button class="nav-item active" data-tooltip="BNBA Search Directory" aria-label="BNBA Search Directory">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/></svg>
+        </button>
+        <button class="nav-item" data-tooltip="Basis Data" aria-label="Basis Data">
+          <svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></svg>
+        </button>
+        <button class="nav-item" data-tooltip="Rumah Tangga" aria-label="Rumah Tangga">
+          <svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+        </button>
+        <button class="nav-item" data-tooltip="Laporan" aria-label="Laporan">
+          <svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="1.5"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>
+        </button>
+        <button class="nav-item" data-tooltip="Bantuan" aria-label="Bantuan">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.2a2.5 2.5 0 1 1 3.6 2.2c-.9.5-1.1 1-1.1 1.9"/><circle cx="12" cy="17" r=".6" fill="currentColor"/></svg>
+        </button>
+      </nav>
+    </aside>
+
+    <!-- MAIN -->
+    <div class="main">
+      <!-- HEADER -->
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-siks">SIKS</span><span class="brand-dash">-</span><span class="brand-ng">NG</span>
+        </div>
+        <div class="topbar-right">
+          <button class="icon-btn" aria-label="Notifikasi" data-tooltip="Notifikasi">
+            <svg viewBox="0 0 24 24"><path d="M6 9a6 6 0 1 1 12 0c0 5 2 6 2 6H4s2-1 2-6Z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>
+          </button>
+          <button class="icon-btn" aria-label="Bantuan" data-tooltip="Bantuan">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.2a2.5 2.5 0 1 1 3.6 2.2c-.9.5-1.1 1-1.1 1.9"/><circle cx="12" cy="17" r=".6" fill="currentColor"/></svg>
+          </button>
+          <button class="avatar-btn" aria-label="Akun saya">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>
+          </button>
+        </div>
+      </header>
+
+      <div class="page">
+        <div class="page-head">
+          <h1>Versi BNBA DTSEN</h1>
+          <p>Pencarian Data Terpadu Kesejahteraan Sosial</p>
+        </div>
+
+        <div class="content-grid">
+          <!-- FILTER PANEL -->
+          <section class="panel filter-panel" id="filterPanel" aria-label="Filter pencarian">
+            <button type="button" class="panel-toggle" id="panelToggle" aria-label="Ciutkan/perluas panel filter" data-tooltip="Ciutkan filter">
+              <svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>
+            </button>
+            <div class="panel-title">
+              <svg viewBox="0 0 24 24"><path d="M4 5h16M7 12h10M10 19h4"/></svg>
+              <span class="panel-title-text">Filter Pencarian</span>
+            </div>
+
+            <form id="filterForm">
+              <div class="field">
+                <label for="f-nik">NIK / No. KK</label>
+                <div class="input-icon">
+                  <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9h10M7 13h6"/></svg>
+                  <input type="text" id="f-nik" placeholder="Masukkan NIK atau KK...">
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="f-provinsi">Provinsi</label>
+                <select id="f-provinsi"><option value="">Pilih Provinsi</option></select>
+              </div>
+
+              <div class="field">
+                <label for="f-kabupaten">Kabupaten/Kota</label>
+                <select id="f-kabupaten" disabled><option value="">Pilih Kabupaten/Kota</option></select>
+              </div>
+
+              <div class="field">
+                <label for="f-kecamatan">Kecamatan</label>
+                <select id="f-kecamatan" disabled><option value="">Pilih Kecamatan</option></select>
+              </div>
+
+              <div class="field">
+                <label for="f-kelurahan">Kelurahan/Desa</label>
+                <select id="f-kelurahan" disabled><option value="">Pilih Kelurahan/Desa</option></select>
+              </div>
+
+              <div class="field">
+                <label for="f-desil">Desil</label>
+                <select id="f-desil">
+                  <option value="">Pilih Desil</option>
+                  <option>Desil 1</option><option>Desil 2</option><option>Desil 3</option>
+                  <option>Desil 4</option><option>Desil 5</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="f-disabilitas">Jenis Disabilitas</label>
+                <select id="f-disabilitas">
+                  <option value="">Pilih Jenis Disabilitas</option>
+                  <option>Tidak Ada</option><option>Fisik</option><option>Netra</option>
+                  <option>Rungu Wicara</option><option>Mental</option><option>Ganda</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="f-status">Status Bansos</label>
+                <select id="f-status">
+                  <option value="">Pilih Status Bansos</option>
+                  <option>Aktif</option><option>Tidak Aktif</option><option>Diajukan</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label>Filter Umur</label>
+                <div class="range-row">
+                  <input type="number" id="f-umur-min" placeholder="Min" min="0">
+                  <input type="number" id="f-umur-max" placeholder="Max" min="0">
+                </div>
+              </div>
+
+              <div class="field">
+                <label>Program Bansos Aktif</label>
+                <div class="chip-grid">
+                  <label class="chip"><input type="checkbox" value="PBI"><span>PBI</span></label>
+                  <label class="chip"><input type="checkbox" value="SEMBAKO"><span>SEMBAKO</span></label>
+                  <label class="chip"><input type="checkbox" value="PKH"><span>PKH</span></label>
+                  <label class="chip"><input type="checkbox" value="YAPI"><span>YAPI</span></label>
+                  <label class="chip"><input type="checkbox" value="PENA"><span>PENA</span></label>
+                </div>
+              </div>
+
+              <button type="submit" class="btn-search">
+                <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+                Cari Data
+              </button>
+              <button type="button" class="btn-reset" id="resetBtn">Reset Filter</button>
+            </form>
+          </section>
+
+          <!-- HASIL PANEL -->
+          <section class="panel result-panel" aria-label="Hasil pencarian">
+            <div class="result-head">
+              <div>
+                <div class="panel-title" style="margin:0">Hasil Pencarian</div>
+                <p class="result-sub" id="resultSub">Menampilkan data berdasarkan filter</p>
+              </div>
+              <div class="view-toggle" role="group" aria-label="Tampilan hasil">
+                <button class="view-btn active" data-view="table" aria-label="Tampilan tabel">
+                  <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="1.5"/><path d="M3 9h18M9 4v16"/></svg>
+                </button>
+                <button class="view-btn" data-view="card" aria-label="Tampilan kartu">
+                  <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                </button>
+              </div>
+            </div>
+
+            <div id="resultBody" class="result-body">
+              <div class="empty-state" id="emptyState">
+                <div class="empty-icon">
+                  <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+                </div>
+                <h3>Belum Ada Data</h3>
+                <p>Silahkan gunakan panel filter di sebelah kiri dan klik "Cari Data" untuk menampilkan hasil pencarian BNBA DTSEN.</p>
+              </div>
+            </div>
+          </section>
+
+          <!-- DETAIL PROFIL KELUARGA -->
+          <section class="panel detail-panel" id="detailPanel" aria-label="Profil keluarga" hidden>
+            <div class="detail-topline">
+              <button type="button" class="back-link" id="backToResults">
+                <svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>
+                Kembali ke Hasil Pencarian
+              </button>
+              <span class="breadcrumb">Manajemen Data / Profil Keluarga</span>
+            </div>
+
+            <div class="detail-head">
+              <div>
+                <h2 id="dNama">Profil Keluarga: -</h2>
+                <div class="detail-sub">
+                  <span class="badge-verif" id="dVerifBadge">Terverifikasi</span>
+                  <span id="dVerifDate">Status verifikasi terakhir: -</span>
+                </div>
+              </div>
+              <div class="detail-actions">
+                <button class="btn-ghost" type="button">
+                  <svg viewBox="0 0 24 24"><path d="M6 9V4h12v5"/><rect x="6" y="13" width="12" height="7"/><path d="M6 13H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-2"/></svg>
+                  Cetak Profil
+                </button>
+                <button class="btn-primary-sm" type="button">
+                  <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                  Update Data
+                </button>
+              </div>
+            </div>
+
+            <div class="stat-cards" id="dStatCards"></div>
+
+            <div class="detail-grid">
+              <div class="detail-col-left">
+                <div class="subpanel">
+                  <div class="family-photo" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+                  </div>
+                  <div class="family-info">
+                    <div class="fi-row">
+                      <div>
+                        <div class="fi-label">Kepala Keluarga</div>
+                        <div class="fi-value fi-strong" id="dKepala">-</div>
+                      </div>
+                      <div>
+                        <div class="fi-label">No. Kartu Keluarga</div>
+                        <div class="fi-value fi-strong" id="dKK">-</div>
+                      </div>
+                    </div>
+                    <div class="fi-tags">
+                      <span class="tag-desil" id="dDesilTag">Desil -</span>
+                    </div>
+                    <div class="fi-row">
+                      <div>
+                        <div class="fi-label">Provinsi</div>
+                        <div class="fi-value" id="dProvinsi">-</div>
+                      </div>
+                      <div>
+                        <div class="fi-label">Kabupaten/Kota</div>
+                        <div class="fi-value" id="dKabupaten">-</div>
+                      </div>
+                    </div>
+                    <div class="fi-row">
+                      <div>
+                        <div class="fi-label">Kecamatan</div>
+                        <div class="fi-value" id="dKecamatan">-</div>
+                      </div>
+                      <div>
+                        <div class="fi-label">Kelurahan</div>
+                        <div class="fi-value" id="dKelurahan">-</div>
+                      </div>
+                    </div>
+                    <div class="fi-row">
+                      <div>
+                        <div class="fi-label">Alamat Jalan</div>
+                        <div class="fi-value" id="dAlamat">-</div>
+                      </div>
+                      <div>
+                        <div class="fi-label">Kode Pos</div>
+                        <div class="fi-value" id="dKodePos">-</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="subpanel">
+                  <div class="subpanel-title">Riwayat Bantuan Sosial (Tahun 2024)</div>
+                  <div class="table-wrap">
+                    <table class="mini-table">
+                      <thead><tr><th>Tanggal</th><th>Jenis Bantuan</th><th>Nilai Bantuan</th><th>Status</th><th></th></tr></thead>
+                      <tbody id="dRiwayat"></tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <div class="two-col">
+                  <div class="subpanel">
+                    <div class="subpanel-title">Catatan Petugas Lapangan</div>
+                    <ul class="note-list" id="dCatatan"></ul>
+                  </div>
+                  <div class="subpanel">
+                    <div class="subpanel-title">Geolokasi Hunian</div>
+                    <div class="map-box" id="dMap">
+                      <span class="map-pin"></span>
+                    </div>
+                    <div class="map-foot">
+                      <span id="dKoordinat">-6.1805, 106.8271</span>
+                      <a href="#" class="map-link">Buka Maps ↗</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="detail-col-right">
+                <div class="subpanel">
+                  <div class="subpanel-title">Aksi Cepat</div>
+                  <div class="quick-actions">
+                    <button type="button"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>Cek Status</button>
+                    <button type="button"><svg viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>Upload KK</button>
+                    <button type="button"><svg viewBox="0 0 24 24"><path d="M12 21s-7-4.6-9.5-9A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 6c-2.5 4.4-9.5 9-9.5 9Z"/></svg>Tag Lokasi</button>
+                    <button type="button"><svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-3-6.2"/><path d="M20 4v5h-5"/></svg>Bantuan</button>
+                  </div>
+                </div>
+
+                <div class="subpanel dana-card">
+                  <div class="dana-label">Total Bantuan Tahun Ini</div>
+                  <div class="dana-value" id="dTotalBantuan">Rp 0</div>
+                  <div class="dana-note" id="dTotalBantuanNote">+0% dari tahun lalu</div>
+                </div>
+
+                <div class="subpanel">
+                  <div class="subpanel-title">Program Aktif</div>
+                  <div class="program-pills" id="dProgramAktif"></div>
+                </div>
+
+                <div class="subpanel">
+                  <div class="subpanel-title">Kondisi Hunian &amp; Aset</div>
+                  <ul class="cond-list" id="dKondisi"></ul>
+                  <div class="cond-note" id="dKondisiCatatan"></div>
+                </div>
+
+                <div class="subpanel analysis-card">
+                  <div class="subpanel-title">Analisis Kesejahteraan</div>
+                  <p id="dAnalisis"></p>
+                  <div class="analysis-actions">
+                    <button class="btn-ghost-sm" type="button">Ekonomi Lemah</button>
+                    <button class="btn-primary-sm" type="button">Butuh Intervensi</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* ============================================================
+   1) DATA WILAYAH (contoh, bertingkat)
+   Ganti bagian ini dengan data API SIKS-NG yang sesungguhnya.
+   ============================================================ */
+const WILAYAH = {
+  "Jawa Barat": {
+    "Kota Bandung": {
+      "Coblong": ["Dago", "Lebak Gede", "Sadang Serang"],
+      "Sukajadi": ["Sukagalih", "Pasteur", "Sukawarna"]
+    },
+    "Kabupaten Bekasi": {
+      "Cikarang Utara": ["Karang Asih", "Sertajaya"],
+      "Tambun Selatan": ["Mekarsari", "Setiadarma"]
+    }
+  },
+  "DKI Jakarta": {
+    "Jakarta Selatan": {
+      "Kebayoran Baru": ["Gunung", "Melawai", "Senayan"],
+      "Tebet": ["Tebet Timur", "Menteng Dalam"]
+    },
+    "Jakarta Timur": {
+      "Duren Sawit": ["Duren Sawit", "Pondok Kelapa"],
+      "Cakung": ["Cakung Barat", "Penggilingan"]
+    }
+  },
+  "Jawa Timur": {
+    "Kota Surabaya": {
+      "Gubeng": ["Airlangga", "Baratajaya"],
+      "Rungkut": ["Rungkut Kidul", "Medokan Ayu"]
+    }
+  }
+};
+
+/* ============================================================
+   2) DATA PENERIMA (dummy, untuk simulasi hasil pencarian)
+   Struktur ini yang idealnya datang dari endpoint backend/BNBA.
+   ============================================================ */
+const DATA_PENERIMA = [
+  { nik:"3273010101900001", nama:"Siti Rahayu", provinsi:"Jawa Barat", kabupaten:"Kota Bandung", kecamatan:"Coblong", kelurahan:"Dago", desil:"Desil 1", umur:52, disabilitas:"Tidak Ada", status:"Aktif", program:["PKH","SEMBAKO"],
+    kk:"3273010101900101", alamat:"Jl. Dago Asri No. 12, RT 003/002", kodePos:"40135", totalPenerima:4,
+    verifTanggal:"12 Oktober 2024 oleh Petugas Kelurahan", progressVerif:100, statusKesejahteraan:"LAYAK",
+    totalBantuanTahun:4450000, catatanNaik:12,
+    riwayat:[
+      {tanggal:"15 Sep 2024", jenis:"PKH Tahap 3", nilai:750000, status:"selesai"},
+      {tanggal:"02 Sep 2024", jenis:"SEMBAKO (BPNT)", nilai:200000, status:"selesai"},
+      {tanggal:"20 Agu 2024", jenis:"Bantuan Beras 10kg", nilai:100000, status:"proses"}
+    ],
+    catatan:[
+      {tanggal:"12 Okt 2024", isi:"Verifikasi dilakukan 40 unit sesuai dengan sistem. Kondisi rumah layak huni."},
+      {tanggal:"30 Sep 2024", isi:"Kunjungan ke-3 memberikan bantuan tepat waktu untuk depan."}
+    ],
+    koordinat:"-6.1805, 106.8271",
+    kondisi:{lantai:"Semen/Keramik Sederhana", dinding:"Tembok Permanen", air:"Sumur Terlindungi/Pribadi", listrik:"450 VA (Subsidi)"},
+    kondisiCatatan:"Rumah dalam kondisi terawat, namun bagian belakang memerlukan perbaikan atap. Tidak memiliki kendaraan roda empat.",
+    analisis:"Keluarga ini masuk dalam kategori ekonomi terbawah. Sangat direkomendasikan berkelanjutan untuk program PKH Kesehatan." },
+
+  { nik:"3273010101880002", nama:"Ahmad Fauzi", provinsi:"Jawa Barat", kabupaten:"Kota Bandung", kecamatan:"Sukajadi", kelurahan:"Pasteur", desil:"Desil 2", umur:37, disabilitas:"Fisik", status:"Aktif", program:["PBI"],
+    kk:"3273010101880201", alamat:"Jl. Pasteur Indah No. 5, RT 001/004", kodePos:"40161", totalPenerima:3,
+    verifTanggal:"03 September 2024 oleh Petugas Kecamatan", progressVerif:85, statusKesejahteraan:"LAYAK",
+    totalBantuanTahun:1200000, catatanNaik:-4,
+    riwayat:[{tanggal:"10 Agu 2024", jenis:"PBI Kesehatan", nilai:1200000, status:"selesai"}],
+    catatan:[{tanggal:"03 Sep 2024", isi:"Kondisi disabilitas fisik terverifikasi, rekomendasi kursi roda telah diajukan."}],
+    koordinat:"-6.8935, 107.5750",
+    kondisi:{lantai:"Ubin Sederhana", dinding:"Tembok Permanen", air:"PDAM", listrik:"900 VA"},
+    kondisiCatatan:"Akses masuk rumah belum ramah difabel, disarankan bantuan renovasi akses.",
+    analisis:"Ekonomi menengah bawah dengan kebutuhan khusus disabilitas. Prioritas pada program kesehatan dan aksesibilitas rumah." },
+
+  { nik:"3216010101950003", nama:"Dewi Lestari", provinsi:"Jawa Barat", kabupaten:"Kabupaten Bekasi", kecamatan:"Cikarang Utara", kelurahan:"Karang Asih", desil:"Desil 3", umur:29, disabilitas:"Tidak Ada", status:"Diajukan", program:["SEMBAKO"],
+    kk:"3216010101950301", alamat:"Jl. Industri Raya No. 21, RT 005/003", kodePos:"17530", totalPenerima:2,
+    verifTanggal:"Belum diverifikasi", progressVerif:35, statusKesejahteraan:"PROSES VERIFIKASI",
+    totalBantuanTahun:0, catatanNaik:0,
+    riwayat:[{tanggal:"01 Okt 2024", jenis:"Pengajuan SEMBAKO", nilai:0, status:"proses"}],
+    catatan:[{tanggal:"01 Okt 2024", isi:"Berkas pengajuan sedang diverifikasi petugas kecamatan."}],
+    koordinat:"-6.2688, 107.1467",
+    kondisi:{lantai:"Tanah", dinding:"Semi Permanen", air:"Sumur Tidak Terlindungi", listrik:"450 VA (Subsidi)"},
+    kondisiCatatan:"Rumah sederhana, verifikasi lapangan masih dijadwalkan.",
+    analisis:"Data masih dalam proses verifikasi lapangan, belum dapat disimpulkan status kesejahteraan akhir." },
+
+  { nik:"3174010101750004", nama:"Bambang Sutrisno", provinsi:"DKI Jakarta", kabupaten:"Jakarta Selatan", kecamatan:"Kebayoran Baru", kelurahan:"Melawai", desil:"Desil 1", umur:61, disabilitas:"Netra", status:"Aktif", program:["PENA","PBI"],
+    kk:"3174010101750401", alamat:"Jl. Melawai VI No. 8, RT 002/001", kodePos:"12160", totalPenerima:3,
+    verifTanggal:"20 Agustus 2024 oleh Petugas Kelurahan", progressVerif:100, statusKesejahteraan:"LAYAK",
+    totalBantuanTahun:3100000, catatanNaik:8,
+    riwayat:[
+      {tanggal:"18 Sep 2024", jenis:"PENA (Penyandang Disabilitas)", nilai:1800000, status:"selesai"},
+      {tanggal:"10 Agu 2024", jenis:"PBI Kesehatan", nilai:1300000, status:"selesai"}
+    ],
+    catatan:[{tanggal:"20 Agu 2024", isi:"Bantuan alat bantu netra telah diserahkan langsung ke penerima."}],
+    koordinat:"-6.2437, 106.7996",
+    kondisi:{lantai:"Keramik", dinding:"Tembok Permanen", air:"PDAM", listrik:"1300 VA"},
+    kondisiCatatan:"Kondisi hunian layak, sudah menerima pendampingan disabilitas rutin.",
+    analisis:"Keluarga dengan anggota disabilitas netra, sudah mendapat program yang sesuai. Pertahankan pendampingan berkala." },
+
+  { nik:"3175010101990005", nama:"Rina Marlina", provinsi:"DKI Jakarta", kabupaten:"Jakarta Timur", kecamatan:"Duren Sawit", kelurahan:"Pondok Kelapa", desil:"Desil 4", umur:24, disabilitas:"Tidak Ada", status:"Tidak Aktif", program:[],
+    kk:"3175010101990501", alamat:"Jl. Pondok Kelapa Raya No. 45, RT 004/006", kodePos:"13450", totalPenerima:1,
+    verifTanggal:"14 Juli 2024 oleh Petugas Kelurahan", progressVerif:100, statusKesejahteraan:"MAMPU",
+    totalBantuanTahun:0, catatanNaik:-100,
+    riwayat:[{tanggal:"14 Jul 2024", jenis:"Penonaktifan Program", nilai:0, status:"selesai"}],
+    catatan:[{tanggal:"14 Jul 2024", isi:"Penerima dinonaktifkan karena sudah memiliki pekerjaan tetap dengan penghasilan di atas UMR."}],
+    koordinat:"-6.2274, 106.9184",
+    kondisi:{lantai:"Keramik", dinding:"Tembok Permanen", air:"PDAM", listrik:"2200 VA"},
+    kondisiCatatan:"Kondisi ekonomi membaik, tidak lagi memenuhi kriteria penerima bansos.",
+    analisis:"Kondisi ekonomi keluarga sudah membaik dan tidak lagi masuk kategori prioritas penerima bantuan." },
+
+  { nik:"3578010101800006", nama:"Joko Prasetyo", provinsi:"Jawa Timur", kabupaten:"Kota Surabaya", kecamatan:"Gubeng", kelurahan:"Airlangga", desil:"Desil 2", umur:45, disabilitas:"Rungu Wicara", status:"Aktif", program:["PKH","YAPI"],
+    kk:"3578010101800601", alamat:"Jl. Airlangga No. 30, RT 002/002", kodePos:"60286", totalPenerima:5,
+    verifTanggal:"05 Oktober 2024 oleh Petugas Kecamatan", progressVerif:92, statusKesejahteraan:"LAYAK",
+    totalBantuanTahun:2650000, catatanNaik:15,
+    riwayat:[
+      {tanggal:"22 Sep 2024", jenis:"PKH Tahap 3", nilai:750000, status:"selesai"},
+      {tanggal:"01 Sep 2024", jenis:"YAPI (Yatim Piatu)", nilai:1900000, status:"selesai"}
+    ],
+    catatan:[{tanggal:"05 Okt 2024", isi:"Anak sulung mendapat pendampingan bahasa isyarat dari petugas sosial."}],
+    koordinat:"-7.2756, 112.7519",
+    kondisi:{lantai:"Semen/Keramik Sederhana", dinding:"Tembok Permanen", air:"PDAM", listrik:"900 VA"},
+    kondisiCatatan:"Rumah cukup layak, memerlukan dukungan pendidikan inklusif untuk anak.",
+    analisis:"Keluarga dengan anggota disabilitas rungu wicara dan anak yatim, direkomendasikan program pendidikan inklusif tambahan." },
+
+  { nik:"3578010101920007", nama:"Sri Wahyuni", provinsi:"Jawa Timur", kabupaten:"Kota Surabaya", kecamatan:"Rungkut", kelurahan:"Medokan Ayu", desil:"Desil 1", umur:33, disabilitas:"Tidak Ada", status:"Aktif", program:["SEMBAKO","PBI"],
+    kk:"3578010101920701", alamat:"Jl. Medokan Ayu No. 17, RT 006/003", kodePos:"60295", totalPenerima:4,
+    verifTanggal:"28 September 2024 oleh Petugas Kelurahan", progressVerif:100, statusKesejahteraan:"SANGAT LAYAK",
+    totalBantuanTahun:3800000, catatanNaik:18,
+    riwayat:[
+      {tanggal:"25 Sep 2024", jenis:"SEMBAKO (BPNT)", nilai:200000, status:"selesai"},
+      {tanggal:"12 Sep 2024", jenis:"PBI Kesehatan", nilai:1200000, status:"selesai"},
+      {tanggal:"05 Agu 2024", jenis:"Bantuan Tunai Darurat", nilai:400000, status:"selesai"}
+    ],
+    catatan:[{tanggal:"28 Sep 2024", isi:"Prioritas sangat tinggi, kondisi ekonomi terlemah di wilayah kelurahan."}],
+    koordinat:"-7.3305, 112.7770",
+    kondisi:{lantai:"Tanah", dinding:"Semi Permanen", air:"Sumur Tidak Terlindungi", listrik:"450 VA (Subsidi)"},
+    kondisiCatatan:"Rumah dalam kondisi kurang layak, bagian belakang mengalami kerusakan atap. Tidak memiliki kendaraan roda empat.",
+    analisis:"Keluarga ini masuk dalam kategori ekonomi terbawah. Sangat direkomendasikan berkelanjutan untuk program PKH Kesehatan." },
+
+  { nik:"3273010101870008", nama:"Andi Kurniawan", provinsi:"Jawa Barat", kabupaten:"Kota Bandung", kecamatan:"Coblong", kelurahan:"Sadang Serang", desil:"Desil 5", umur:40, disabilitas:"Tidak Ada", status:"Tidak Aktif", program:[],
+    kk:"3273010101870801", alamat:"Jl. Sadang Serang No. 9, RT 001/002", kodePos:"40133", totalPenerima:3,
+    verifTanggal:"02 Juni 2024 oleh Petugas Kelurahan", progressVerif:100, statusKesejahteraan:"MAMPU",
+    totalBantuanTahun:0, catatanNaik:-100,
+    riwayat:[{tanggal:"02 Jun 2024", jenis:"Penonaktifan Program", nilai:0, status:"selesai"}],
+    catatan:[{tanggal:"02 Jun 2024", isi:"Hasil verifikasi ulang menunjukkan keluarga sudah mampu secara ekonomi."}],
+    koordinat:"-6.8842, 107.6142",
+    kondisi:{lantai:"Keramik", dinding:"Tembok Permanen", air:"PDAM", listrik:"2200 VA"},
+    kondisiCatatan:"Kondisi rumah baik, memiliki kendaraan roda empat.",
+    analisis:"Keluarga tidak lagi memenuhi kriteria penerima bantuan sosial berdasarkan hasil verifikasi lapangan." },
+
+  { nik:"3174010101650009", nama:"Hj. Maimunah", provinsi:"DKI Jakarta", kabupaten:"Jakarta Selatan", kecamatan:"Tebet", kelurahan:"Tebet Timur", desil:"Desil 1", umur:68, disabilitas:"Ganda", status:"Aktif", program:["PENA","PKH","SEMBAKO"],
+    kk:"3174010101650901", alamat:"Jl. Tebet Timur Dalam No. 3, RT 003/005", kodePos:"12820", totalPenerima:2,
+    verifTanggal:"09 Oktober 2024 oleh Petugas Kelurahan", progressVerif:100, statusKesejahteraan:"SANGAT LAYAK",
+    totalBantuanTahun:5200000, catatanNaik:22,
+    riwayat:[
+      {tanggal:"28 Sep 2024", jenis:"PENA Lansia", nilai:2000000, status:"selesai"},
+      {tanggal:"15 Sep 2024", jenis:"PKH Tahap 3", nilai:750000, status:"selesai"},
+      {tanggal:"02 Sep 2024", jenis:"SEMBAKO (BPNT)", nilai:200000, status:"selesai"}
+    ],
+    catatan:[{tanggal:"09 Okt 2024", isi:"Lansia dengan disabilitas ganda, membutuhkan pendampingan rutin dari kader posyandu lansia."}],
+    koordinat:"-6.2265, 106.8503",
+    kondisi:{lantai:"Semen/Keramik Sederhana", dinding:"Tembok Permanen", air:"Sumur Terlindungi/Pribadi", listrik:"450 VA (Subsidi)"},
+    kondisiCatatan:"Membutuhkan alat bantu tambahan untuk mobilitas sehari-hari.",
+    analisis:"Lansia dengan disabilitas ganda dan kondisi ekonomi lemah, prioritas tertinggi untuk pendampingan berkelanjutan." },
+
+  { nik:"3216010101910010", nama:"Yusuf Hidayat", provinsi:"Jawa Barat", kabupaten:"Kabupaten Bekasi", kecamatan:"Tambun Selatan", kelurahan:"Setiadarma", desil:"Desil 3", umur:31, disabilitas:"Tidak Ada", status:"Diajukan", program:["YAPI"],
+    kk:"3216010101911001", alamat:"Jl. Setiadarma No. 14, RT 002/007", kodePos:"17510", totalPenerima:3,
+    verifTanggal:"Belum diverifikasi", progressVerif:50, statusKesejahteraan:"PROSES VERIFIKASI",
+    totalBantuanTahun:0, catatanNaik:0,
+    riwayat:[{tanggal:"28 Sep 2024", jenis:"Pengajuan YAPI", nilai:0, status:"proses"}],
+    catatan:[{tanggal:"28 Sep 2024", isi:"Menunggu kelengkapan dokumen akta kematian untuk verifikasi status yatim."}],
+    koordinat:"-6.2530, 107.0632",
+    kondisi:{lantai:"Ubin Sederhana", dinding:"Tembok Permanen", air:"PDAM", listrik:"900 VA"},
+    kondisiCatatan:"Kondisi rumah cukup layak, menunggu kelengkapan berkas.",
+    analisis:"Pengajuan masih menunggu kelengkapan dokumen sebelum dapat diverifikasi lebih lanjut." }
+];
+
+/* ============================================================
+   3) ELEMEN
+   ============================================================ */
+const elProvinsi   = document.getElementById('f-provinsi');
+const elKabupaten  = document.getElementById('f-kabupaten');
+const elKecamatan  = document.getElementById('f-kecamatan');
+const elKelurahan  = document.getElementById('f-kelurahan');
+const elNik        = document.getElementById('f-nik');
+const elDesil      = document.getElementById('f-desil');
+const elDisabilitas= document.getElementById('f-disabilitas');
+const elStatus     = document.getElementById('f-status');
+const elUmurMin    = document.getElementById('f-umur-min');
+const elUmurMax    = document.getElementById('f-umur-max');
+const form         = document.getElementById('filterForm');
+const resetBtn     = document.getElementById('resetBtn');
+const resultBody   = document.getElementById('resultBody');
+const resultSub    = document.getElementById('resultSub');
+const viewButtons  = document.querySelectorAll('.view-btn');
+
+const filterPanel  = document.getElementById('filterPanel');
+const panelToggle  = document.getElementById('panelToggle');
+const contentGrid  = document.querySelector('.content-grid');
+const resultPanel  = document.querySelector('.result-panel');
+const detailPanel  = document.getElementById('detailPanel');
+const backToResults= document.getElementById('backToResults');
+
+let currentView = 'table';
+let lastResults = null;
+let manualToggle = false; // true kalau user sendiri yang klik panah (bukan auto saat buka detail)
+
+/* ============================================================
+   4) ISI DROPDOWN WILAYAH SECARA BERTINGKAT
+   ============================================================ */
+function fillSelect(select, options, placeholder){
+  select.innerHTML = `<option value="">${placeholder}</option>`;
+  options.forEach(opt=>{
+    const o = document.createElement('option');
+    o.value = opt; o.textContent = opt;
+    select.appendChild(o);
+  });
+}
+
+function resetDownstream(from){
+  if(from === 'provinsi'){
+    fillSelect(elKabupaten, [], 'Pilih Kabupaten/Kota'); elKabupaten.disabled = true;
+    fillSelect(elKecamatan, [], 'Pilih Kecamatan'); elKecamatan.disabled = true;
+    fillSelect(elKelurahan, [], 'Pilih Kelurahan/Desa'); elKelurahan.disabled = true;
+  }
+  if(from === 'kabupaten'){
+    fillSelect(elKecamatan, [], 'Pilih Kecamatan'); elKecamatan.disabled = true;
+    fillSelect(elKelurahan, [], 'Pilih Kelurahan/Desa'); elKelurahan.disabled = true;
+  }
+  if(from === 'kecamatan'){
+    fillSelect(elKelurahan, [], 'Pilih Kelurahan/Desa'); elKelurahan.disabled = true;
+  }
+}
+
+fillSelect(elProvinsi, Object.keys(WILAYAH), 'Pilih Provinsi');
+
+elProvinsi.addEventListener('change', ()=>{
+  resetDownstream('provinsi');
+  const prov = WILAYAH[elProvinsi.value];
+  if(prov){
+    fillSelect(elKabupaten, Object.keys(prov), 'Pilih Kabupaten/Kota');
+    elKabupaten.disabled = false;
+  }
+});
+
+elKabupaten.addEventListener('change', ()=>{
+  resetDownstream('kabupaten');
+  const kab = WILAYAH[elProvinsi.value]?.[elKabupaten.value];
+  if(kab){
+    fillSelect(elKecamatan, Object.keys(kab), 'Pilih Kecamatan');
+    elKecamatan.disabled = false;
+  }
+});
+
+elKecamatan.addEventListener('change', ()=>{
+  resetDownstream('kecamatan');
+  const kec = WILAYAH[elProvinsi.value]?.[elKabupaten.value]?.[elKecamatan.value];
+  if(kec){
+    fillSelect(elKelurahan, kec, 'Pilih Kelurahan/Desa');
+    elKelurahan.disabled = false;
+  }
+});
+
+/* ============================================================
+   5) MOBILE SIDEBAR TOGGLE
+   ============================================================ */
+const sidebar = document.getElementById('sidebar');
+const overlay = document.getElementById('overlay');
+document.getElementById('mobileToggle').addEventListener('click', ()=>{
+  sidebar.classList.add('open'); overlay.classList.add('show');
+});
+overlay.addEventListener('click', ()=>{
+  sidebar.classList.remove('open'); overlay.classList.remove('show');
+});
+
+/* ============================================================
+   6) VIEW TOGGLE (tabel / kartu)
+   ============================================================ */
+viewButtons.forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    viewButtons.forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    currentView = btn.dataset.view;
+    if(lastResults) renderResults(lastResults);
+  });
+});
+
+/* ============================================================
+   7) SUBMIT FILTER -> CARI DATA
+   ============================================================ */
+form.addEventListener('submit', (e)=>{
+  e.preventDefault();
+  showLoading();
+  // simulasi latensi request ke server
+  setTimeout(()=>{
+    const results = applyFilters();
+    lastResults = results;
+    renderResults(results);
+  }, 500);
+});
+
+resetBtn.addEventListener('click', ()=>{
+  form.reset();
+  resetDownstream('provinsi');
+  lastResults = null;
+  resultSub.textContent = 'Menampilkan data berdasarkan filter';
+  resultBody.innerHTML = emptyStateHTML();
+});
+
+function showLoading(){
+  resultSub.textContent = 'Mencari data...';
+  resultBody.innerHTML = `
+    <div class="skeleton-row"></div>
+    <div class="skeleton-row"></div>
+    <div class="skeleton-row"></div>
+    <div class="skeleton-row"></div>`;
+}
+
+function applyFilters(){
+  const nik = elNik.value.trim();
+  const checkedProgram = Array.from(document.querySelectorAll('.chip input:checked')).map(c=>c.value);
+  const umurMin = elUmurMin.value ? parseInt(elUmurMin.value) : null;
+  const umurMax = elUmurMax.value ? parseInt(elUmurMax.value) : null;
+
+  return DATA_PENERIMA.filter(row=>{
+    if(nik && !row.nik.includes(nik)) return false;
+    if(elProvinsi.value && row.provinsi !== elProvinsi.value) return false;
+    if(elKabupaten.value && row.kabupaten !== elKabupaten.value) return false;
+    if(elKecamatan.value && row.kecamatan !== elKecamatan.value) return false;
+    if(elKelurahan.value && row.kelurahan !== elKelurahan.value) return false;
+    if(elDesil.value && row.desil !== elDesil.value) return false;
+    if(elDisabilitas.value && row.disabilitas !== elDisabilitas.value) return false;
+    if(elStatus.value && row.status !== elStatus.value) return false;
+    if(umurMin !== null && row.umur < umurMin) return false;
+    if(umurMax !== null && row.umur > umurMax) return false;
+    if(checkedProgram.length && !checkedProgram.every(p=>row.program.includes(p))) return false;
+    return true;
+  });
+}
+
+/* ============================================================
+   8) RENDER HASIL
+   ============================================================ */
+function emptyStateHTML(){
+  return `
+    <div class="empty-state">
+      <div class="empty-icon">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      </div>
+      <h3>Belum Ada Data</h3>
+      <p>Silahkan gunakan panel filter di sebelah kiri dan klik "Cari Data" untuk menampilkan hasil pencarian BNBA DTSEN.</p>
+    </div>`;
+}
+
+function noMatchHTML(){
+  return `
+    <div class="empty-state">
+      <div class="empty-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9L2.8 17a2 2 0 0 0 1.7 3h15a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>
+      </div>
+      <h3>Data Tidak Ditemukan</h3>
+      <p>Tidak ada data yang cocok dengan kombinasi filter yang dipilih. Coba longgarkan salah satu filter, misalnya rentang umur atau program bansos.</p>
+    </div>`;
+}
+
+function badgeClass(status){
+  if(status === 'Aktif') return 'aktif';
+  if(status === 'Tidak Aktif') return 'tidak';
+  return 'diajukan';
+}
+
+function renderResults(rows){
+  resultSub.textContent = `Menampilkan ${rows.length} data berdasarkan filter`;
+
+  if(rows.length === 0){
+    resultBody.innerHTML = noMatchHTML();
+    return;
+  }
+
+  if(currentView === 'table'){
+    resultBody.innerHTML = `
+      <table class="result-table">
+        <thead>
+          <tr>
+            <th>NIK</th><th>Nama</th><th>Wilayah</th><th>Desil</th>
+            <th>Umur</th><th>Status Bansos</th><th>Program Aktif</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.map(r=>`
+            <tr data-nik="${r.nik}">
+              <td>${r.nik}</td>
+              <td><span class="name-link">${r.nama}</span></td>
+              <td>${r.kelurahan}, ${r.kecamatan}</td>
+              <td>${r.desil}</td>
+              <td>${r.umur}</td>
+              <td><span class="badge ${badgeClass(r.status)}">${r.status}</span></td>
+              <td>${r.program.length ? r.program.map(p=>`<span class="prog-pill">${p}</span>`).join('') : '<span style="color:#a7adba">-</span>'}</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>`;
+  } else {
+    resultBody.innerHTML = `
+      <div class="result-cards">
+        ${rows.map(r=>`
+          <div class="result-card" data-nik="${r.nik}">
+            <h4 class="name-link">${r.nama}</h4>
+            <div class="nik">${r.nik}</div>
+            <div class="row"><span>Wilayah</span><b>${r.kelurahan}, ${r.kecamatan}</b></div>
+            <div class="row"><span>Desil</span><b>${r.desil}</b></div>
+            <div class="row"><span>Umur</span><b>${r.umur} th</b></div>
+            <div class="row"><span>Status</span><b><span class="badge ${badgeClass(r.status)}">${r.status}</span></b></div>
+            <div style="margin-top:8px">
+              ${r.program.length ? r.program.map(p=>`<span class="prog-pill">${p}</span>`).join('') : '<span style="color:#a7adba;font-size:12px">Tidak ada program aktif</span>'}
+            </div>
+          </div>`).join('')}
+      </div>`;
+  }
+}
+
+</script>
+</body>
+</html>
